@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persuasion Academy — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050710;--surface:#090d1c;--card:#0e1828;--card2:#111e30;
+  --border:#182540;--border-light:#1f3054;
+  --accent:#c9953a;--gold:#e8b84c;--gold-soft:#f5d070;--gold-dim:#7a5a1e;
+  --plat:#b0bec9;--plat-dim:#6a7f90;
+  --text:#dde6f5;--muted:#8a9cba;--dim:#506080;
+  --hot:#ff6b6b;--hot-bg:rgba(42,8,8,0.7);
+  --high:#7edd6e;--high-bg:rgba(28,42,14,0.7);
+  --ret:#6eabdd;
+  --r:12px;--rl:16px;
+  --expo:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;overflow:hidden}
+body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;pointer-events:none;background:linear-gradient(90deg,transparent,var(--gold-dim) 15%,var(--gold-soft) 35%,var(--gold) 50%,var(--gold-soft) 65%,var(--gold-dim) 85%,transparent);background-size:200% auto;animation:shimBar 4s linear infinite}
+@keyframes shimBar{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes shimText{0%{background-position:200% center}100%{background-position:-50% center}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:2px}
+
+/* ── SHELL ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sidebar{width:255px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
+#sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dim),var(--gold),var(--gold-dim),transparent)}
+.sb-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sb-ey{font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--plat-dim);margin-bottom:6px}
+.sb-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1.3}
+.sb-title em{font-style:italic;background:linear-gradient(90deg,var(--gold-dim),var(--gold-soft) 40%,var(--gold) 55%,var(--gold-soft) 70%,var(--gold-dim));background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimText 5s linear infinite}
+.sb-badge{display:inline-block;margin-top:8px;font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);border:1px solid rgba(201,149,58,.2);padding:3px 10px;border-radius:20px;background:rgba(201,149,58,.04)}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+.nav-grp{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);padding:12px 20px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 20px;cursor:pointer;border:none;background:none;width:100%;text-align:left;position:relative;color:var(--muted);font-size:12.5px;font-family:'DM Sans',sans-serif;transition:background .18s,color .18s}
+.nav-item:hover{background:rgba(201,149,58,.06);color:var(--text)}
+.nav-item.active{background:rgba(201,149,58,.1);color:var(--text)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--gold-soft),var(--accent));box-shadow:2px 0 10px rgba(201,149,58,.3)}
+.nav-ic{font-size:12px;width:16px;text-align:center;flex-shrink:0}
+.nav-bd{margin-left:auto;font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px}
+.nb-hot{background:rgba(255,107,107,.12);color:var(--hot);border:1px solid rgba(255,107,107,.2)}
+.nb-gold{background:rgba(201,149,58,.1);color:var(--gold);border:1px solid rgba(201,149,58,.22)}
+.sb-foot{padding:12px 20px;border-top:1px solid var(--border)}
+.sb-conn{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--dim)}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.conn-dot.live{background:var(--high);box-shadow:0 0 5px rgba(126,221,110,.5);animation:pulse 2s infinite}
+.conn-dot.err{background:var(--hot)}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:13px 26px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.tb-left{}
+.tb-page{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;line-height:1}
+.tb-sub{font-family:'Cormorant Garamond',serif;font-size:12.5px;font-style:italic;color:var(--dim);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.url-lbl{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.url-in{background:var(--card);border:1px solid var(--border-light);border-radius:8px;color:var(--muted);font-size:11px;padding:6px 12px;width:230px;font-family:'DM Sans',sans-serif;transition:border .18s}
+.url-in:focus{outline:none;border-color:var(--accent);color:var(--text)}
+.pw-in{width:120px}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Barlow',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:7px 16px;border-radius:8px;border:1px solid rgba(201,149,58,.28);background:rgba(201,149,58,.07);color:var(--gold);cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn:hover{background:rgba(201,149,58,.15);border-color:var(--accent)}
+.btn.pri{background:linear-gradient(135deg,var(--accent),var(--gold));color:#070b18;border:none;box-shadow:0 2px 14px rgba(201,149,58,.2)}
+.btn.pri:hover{box-shadow:0 4px 22px rgba(201,149,58,.35)}
+.btn.sm{padding:5px 11px;font-size:8.5px}
+.btn.danger{border-color:rgba(255,107,107,.28);background:rgba(255,107,107,.07);color:var(--hot)}
+.btn.danger:hover{background:rgba(255,107,107,.15)}
+.btn.ghost{border-color:var(--border-light);background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--card)}
+.btn:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
+
+/* ── SCROLL CONTENT ── */
+.scroll{flex:1;overflow-y:auto}
+.content{padding:22px 26px;animation:fadeUp .35s var(--expo)}
+
+/* ── PAGE VISIBILITY ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:17px 19px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);opacity:.35}
+.stat-ey{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:9px}
+.stat-n{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1}
+.stat-n.c-hot{color:var(--hot)}
+.stat-n.c-gold{background:linear-gradient(90deg,var(--accent),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat-n.c-high{color:var(--high)}
+.stat-sub{font-size:11px;color:var(--dim);margin-top:5px}
+
+/* ── PANELS ── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:16px}
+.ph{padding:12px 17px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pt{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:var(--plat-dim);display:flex;align-items:center;gap:7px}
+.pb{padding:14px 17px}
+
+/* ── TWO COL ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── HOT LEAD ROW ── */
+.hl-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:10px;background:var(--hot-bg);border:1px solid rgba(255,107,107,.12);margin-bottom:8px;cursor:pointer;transition:all .18s;animation:fadeUp .3s var(--expo)}
+.hl-row:hover{background:rgba(50,8,8,.8);border-color:rgba(255,107,107,.28)}
+.hl-row.high{background:var(--high-bg);border-color:rgba(126,221,110,.12)}
+.hl-row.high:hover{background:rgba(35,55,15,.8);border-color:rgba(126,221,110,.28)}
+.hl-av{width:34px;height:34px;border-radius:50%;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.18);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--hot);flex-shrink:0}
+.hl-av.av-high{background:rgba(126,221,110,.08);border-color:rgba(126,221,110,.18);color:var(--high)}
+.hl-info{flex:1;min-width:0}
+.hl-name{font-weight:500;font-size:12.5px}
+.hl-email{font-size:10.5px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hl-meta{display:flex;gap:8px;margin-top:3px;align-items:center;flex-wrap:wrap}
+.tag{font-family:'Barlow',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.t-hot{background:rgba(255,107,107,.12);color:var(--hot);border:1px solid rgba(255,107,107,.2)}
+.t-high{background:rgba(126,221,110,.1);color:var(--high);border:1px solid rgba(126,221,110,.2)}
+.t-ret{background:rgba(110,171,221,.1);color:var(--ret);border:1px solid rgba(110,171,221,.2)}
+.t-auto{background:rgba(126,221,110,.08);color:var(--high);border:1px solid rgba(126,221,110,.15)}
+.t-manual{background:rgba(201,149,58,.08);color:var(--gold);border:1px solid rgba(201,149,58,.18)}
+.t-paused{background:rgba(80,96,128,.1);color:var(--muted);border:1px solid rgba(80,96,128,.2)}
+.hl-logins{font-family:'Barlow',sans-serif;font-size:9px;color:var(--dim)}
+.hl-logins b{color:var(--hot)}
+.hl-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0}
+.reach-btn{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:1px solid rgba(255,107,107,.28);background:rgba(255,107,107,.07);color:var(--hot);cursor:pointer;transition:all .18s;white-space:nowrap}
+.reach-btn:hover{background:rgba(255,107,107,.18)}
+.reach-btn.done{border-color:rgba(126,221,110,.28);background:rgba(126,221,110,.07);color:var(--high)}
+.mode-sel{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:6px;border:1px solid var(--border-light);background:var(--card2);color:var(--muted);cursor:pointer;font-size:9px}
+.mode-sel:focus{outline:none;border-color:var(--accent)}
+
+/* ── LEADS TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{border-bottom:1px solid var(--border)}
+th{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:8px 11px;text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--muted)}
+td{padding:9px 11px;border-bottom:1px solid rgba(24,37,64,.45);font-size:11.5px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(201,149,58,.025)}
+.sb-hot{background:rgba(255,107,107,.1);color:var(--hot);border:1px solid rgba(255,107,107,.18)}
+.sb-high{background:rgba(126,221,110,.08);color:var(--high);border:1px solid rgba(126,221,110,.18)}
+.sb-ret{background:rgba(110,171,221,.08);color:var(--ret);border:1px solid rgba(110,171,221,.18)}
+.sb-act{background:rgba(80,96,128,.08);color:var(--muted);border:1px solid rgba(80,96,128,.18)}
+
+/* ── SEQUENCE GRID ── */
+.seq-grid{width:100%;border-collapse:collapse;min-width:600px}
+.seq-grid th{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.seq-grid td{padding:9px 10px;border-bottom:1px solid rgba(24,37,64,.4);font-size:11.5px;vertical-align:middle}
+.seq-grid tr:last-child td{border-bottom:none}
+.seq-grid tr:hover td{background:rgba(201,149,58,.025)}
+.email-dot{width:26px;height:26px;border-radius:50%;border:1px solid var(--border-light);display:inline-flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;color:var(--dim);transition:all .2s}
+.ed-sent{background:rgba(126,221,110,.14);border-color:rgba(126,221,110,.3);color:var(--high)}
+.ed-pending{background:rgba(201,149,58,.1);border-color:rgba(201,149,58,.28);color:var(--gold);animation:pulse 2s infinite}
+.ed-none{opacity:.4}
+
+/* ── LOGIN FEED ── */
+.lf-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(24,37,64,.38)}
+.lf-row:last-child{border-bottom:none}
+.lf-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.lf-hot{background:var(--hot);box-shadow:0 0 5px rgba(255,107,107,.4)}
+.lf-high{background:var(--high)}
+.lf-norm{background:var(--border-light)}
+.lf-txt{flex:1;font-size:11.5px;color:var(--muted);line-height:1.45}
+.lf-txt strong{color:var(--text);font-weight:500}
+.lf-time{font-size:10px;color:var(--dim);font-family:'Barlow',sans-serif;white-space:nowrap}
+
+/* ── TRACKING PANEL ── */
+.trk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(24,37,64,.38);font-size:11.5px}
+.trk-row:last-child{border-bottom:none}
+.trk-name{width:130px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.trk-email{flex:1;color:var(--dim);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trk-stat{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.trk-pill{font-family:'Barlow',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tp-open{background:rgba(110,171,221,.1);color:var(--ret);border:1px solid rgba(110,171,221,.2)}
+.tp-no{background:rgba(80,96,128,.08);color:var(--dim);border:1px solid rgba(80,96,128,.18)}
+.tp-click{background:rgba(126,221,110,.1);color:var(--high);border:1px solid rgba(126,221,110,.2)}
+
+/* ── EMAIL EDITOR ── */
+.email-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.etab{font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s}
+.etab:hover{border-color:var(--border-light);color:var(--text)}
+.etab.active{border-color:rgba(201,149,58,.35);background:rgba(201,149,58,.1);color:var(--gold)}
+.ep{display:none}
+.ep.active{display:block}
+.field-grp{margin-bottom:14px}
+.field-lbl{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.field-in{width:100%;background:var(--card2);border:1px solid var(--border-light);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;padding:9px 13px;transition:border .18s;resize:vertical}
+.field-in:focus{outline:none;border-color:var(--accent)}
+textarea.field-in{min-height:180px;line-height:1.7;font-size:12px}
+.field-in::placeholder{color:var(--dim)}
+.e5-extras{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.e5-title{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:12px}
+.e5-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── MODE TOGGLE ── */
+.mode-toggle{display:flex;gap:6px;margin-bottom:14px}
+.mode-btn{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.mode-btn:hover{border-color:var(--border-light);color:var(--text)}
+.mode-btn.active{border-color:rgba(201,149,58,.35);background:rgba(201,149,58,.1);color:var(--gold)}
+.mdot{width:6px;height:6px;border-radius:50%}
+.mdot-a{background:var(--high);box-shadow:0 0 5px rgba(126,221,110,.45)}
+.mdot-m{background:var(--gold)}
+
+/* ── QUICK SEND CARDS ── */
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .18s}
+.qcard:hover{border-color:var(--border-light);background:var(--card2)}
+.qc-num{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.qc-subj{font-size:12.5px;font-weight:500;color:var(--text);line-height:1.35;margin-bottom:4px}
+.qc-sub{font-size:11px;color:var(--dim)}
+
+/* ── SETTINGS ── */
+.cfg-row{margin-bottom:13px}
+.cfg-lbl{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.cfg-in{width:100%;background:var(--card2);border:1px solid var(--border-light);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;padding:9px 13px;transition:border .18s}
+.cfg-in:focus{outline:none;border-color:var(--accent)}
+.info-box{background:rgba(201,149,58,.04);border:1px dashed rgba(201,149,58,.2);border-radius:10px;padding:13px;font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:14px}
+.info-box strong{color:var(--muted)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:30px;color:var(--dim)}
+.empty-ic{font-size:24px;margin-bottom:8px;opacity:.4}
+.empty-tx{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px}
+
+/* ── MODAL ── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.mo.open{opacity:1;pointer-events:all}
+.mo-box{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--rl);width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:24px;position:relative;transform:translateY(16px);transition:transform .3s var(--expo)}
+.mo.open .mo-box{transform:none}
+.mo-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:5px}
+.mo-sub{font-size:12px;color:var(--dim);margin-bottom:18px}
+.mo-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;line-height:1}
+.mo-acts{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--card);border:1px solid var(--border-light);border-radius:10px;padding:11px 17px;font-size:12px;color:var(--text);box-shadow:0 8px 36px rgba(0,0,0,.5);transform:translateY(70px);opacity:0;transition:all .28s var(--expo);z-index:9998;max-width:290px;line-height:1.45}
+#toast.show{transform:none;opacity:1}
+#toast.ok{border-color:rgba(126,221,110,.3);background:rgba(14,42,8,.95)}
+#toast.err{border-color:rgba(255,107,107,.3);background:rgba(42,8,8,.95)}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px}
+.sh-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700}
+.sh-title em{font-style:italic;color:var(--gold)}
+.sh-right{display:flex;align-items:center;gap:9px}
+
+/* search */
+.srch{background:var(--card2);border:1px solid var(--border-light);border-radius:8px;color:var(--text);font-size:12px;padding:6px 12px;font-family:'DM Sans',sans-serif;width:180px;transition:border .18s}
+.srch:focus{outline:none;border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ─── SIDEBAR ─── -->
+  <div id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-ey">Persuasion Academy by RA</div>
+      <div class="sb-title">Admin <em>Command</em></div>
+      <div class="sb-badge">Marketing Dashboard v4</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-grp">Intelligence</div>
+      <button class="nav-item active" onclick="nav('overview')"><span class="nav-ic">◈</span>Overview</button>
+      <button class="nav-item" onclick="nav('hotleads')"><span class="nav-ic">🔥</span>Hot Leads<span class="nav-bd nb-hot" id="nb-hot">0</span></button>
+      <div class="nav-grp">Leads</div>
+      <button class="nav-item" onclick="nav('allleads')"><span class="nav-ic">◉</span>All Leads<span class="nav-bd nb-gold" id="nb-total">0</span></button>
+      <button class="nav-item" onclick="nav('logins')"><span class="nav-ic">◎</span>Login Feed</button>
+      <div class="nav-grp">Automation</div>
+      <button class="nav-item" onclick="nav('sequence')"><span class="nav-ic">✉</span>Sequence Tracker</button>
+      <button class="nav-item" onclick="nav('editor')"><span class="nav-ic">✎</span>Email Editor</button>
+      <button class="nav-item" onclick="nav('tracking')"><span class="nav-ic">◍</span>Open & Click Data</button>
+      <button class="nav-item" onclick="nav('stats')"><span class="nav-ic">📊</span>Stats & A/B Results</button>
+      <button class="nav-item" onclick="nav('reengagement')"><span class="nav-ic">♻</span>Re-engagement</button>
+      <div class="nav-grp">Revenue</div>
+      <button class="nav-item" onclick="nav('purchases')"><span class="nav-ic">💰</span>Purchases<span class="nav-bd nb-gold" id="nb-purch">0</span></button>
+      <button class="nav-item" onclick="nav('failures')"><span class="nav-ic">⚠</span>Failed Emails<span class="nav-bd nb-hot" id="nb-fail" style="display:none">0</span></button>
+      <button class="nav-item" onclick="nav('dailylog')"><span class="nav-ic">📋</span>Daily Send Log</button>
+      <div class="nav-grp">Settings</div>
+      <button class="nav-item" onclick="nav('settings')"><span class="nav-ic">⚙</span>Configuration</button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-conn"><span class="conn-dot" id="cdot"></span><span id="cstat">Not connected</span></div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN ─── -->
+  <div id="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-page" id="pg-title">Overview</div>
+        <div class="tb-sub" id="pg-sub">Dark Seduction: Fundamentals Course</div>
+      </div>
+      <div class="tb-right">
+        <span class="url-lbl">Script URL</span>
+        <input class="url-in" id="url-in" placeholder="https://script.google.com/macros/s/...">
+        <span class="url-lbl">Password</span>
+        <input class="url-in pw-in" id="pw-in" type="password" placeholder="admin password">
+        <button class="btn pri" onclick="loadData()">Load Data</button>
+      </div>
+    </div>
+
+    <div class="scroll">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div id="page-overview" class="page active">
+        <div class="content">
+          <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+            <div class="stat"><div class="stat-ey">Total Leads</div><div class="stat-n c-gold" id="s-total">—</div><div class="stat-sub">All time signups</div></div>
+            <div class="stat"><div class="stat-ey">Hot Leads 🔥</div><div class="stat-n c-hot" id="s-hot">—</div><div class="stat-sub">3+ logins — act now</div></div>
+            <div class="stat"><div class="stat-ey">High Interest ⚡</div><div class="stat-n c-high" id="s-high">—</div><div class="stat-sub">2 logins — warming</div></div>
+            <div class="stat"><div class="stat-ey">Emails Opened</div><div class="stat-n" id="s-opens" style="color:var(--ret)">—</div><div class="stat-sub">Unique open events</div></div>
+            <div class="stat"><div class="stat-ey">Revenue ₹</div><div class="stat-n c-gold" id="s-revenue">—</div><div class="stat-sub">Total purchases</div></div>
+          </div>
+          <div class="g2">
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">🔥 Hot Leads</div><button class="btn sm" onclick="nav('hotleads')">View All</button></div>
+                <div class="pb" id="hot-preview"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Load data to see hot leads</div></div></div>
+              </div>
+              <div class="panel">
+                <div class="ph"><div class="pt">◎ Recent Logins</div></div>
+                <div class="pb" id="login-preview"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">✉ Sequence At a Glance</div><button class="btn sm" onclick="nav('sequence')">Manage</button></div>
+                <div class="pb" id="seq-preview"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div></div>
+              </div>
+              <div class="panel">
+                <div class="ph"><div class="pt">◍ Open & CTA Tracking</div><button class="btn sm" onclick="nav('tracking')">Full View</button></div>
+                <div class="pb" id="trk-preview"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ HOT LEADS ═══ -->
+      <div id="page-hotleads" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Hot Leads — <em>Strike Now</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          </div>
+          <div id="hot-full"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Load data to see hot leads</div></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ ALL LEADS ═══ -->
+      <div id="page-allleads" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">All <em>Leads</em></div>
+            <div class="sh-right">
+              <input class="srch" id="lead-srch" placeholder="Search name or email…" oninput="filterLeads()">
+              <button class="btn pri" onclick="loadData()">↻ Refresh</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th onclick="sortLeads('num')">#</th>
+                  <th onclick="sortLeads('name')">Name</th>
+                  <th>Email</th>
+                  <th onclick="sortLeads('enrolled')">Enrolled</th>
+                  <th onclick="sortLeads('logins')">Logins ↕</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th onclick="sortLeads('daysSince')">Days</th>
+                  <th onclick="sortLeads('engagementScore')">Score</th>
+                  <th>Seq Mode</th>
+                </tr></thead>
+                <tbody id="leads-tbody"><tr><td colspan="10" style="text-align:center;color:var(--dim);padding:30px">Load data to see leads</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ LOGINS ═══ -->
+      <div id="page-logins" class="page">
+        <div class="content">
+          <div class="sh"><div class="sh-title">Login <em>Feed</em></div><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          <div class="panel"><div class="pb" id="login-full"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ SEQUENCE TRACKER ═══ -->
+      <div id="page-sequence" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Sequence <em>Tracker</em></div>
+            <div class="sh-right">
+              <button class="btn" onclick="runManual()">▶ Run Due Emails Now</button>
+              <button class="btn pri" onclick="loadData()">↻ Refresh</button>
+            </div>
+          </div>
+          <div class="g2" style="margin-bottom:16px">
+            <!-- Mode panel -->
+            <div class="panel">
+              <div class="ph"><div class="pt">Global Sequence Mode</div></div>
+              <div class="pb">
+                <div class="mode-toggle">
+                  <button class="mode-btn active" id="mb-auto" onclick="setGlobalMode('auto')"><span class="mdot mdot-a"></span>AUTO — Daily 9AM</button>
+                  <button class="mode-btn" id="mb-man" onclick="setGlobalMode('manual')"><span class="mdot mdot-m"></span>MANUAL</button>
+                </div>
+                <div style="font-size:11.5px;color:var(--dim);line-height:1.7">
+                  <strong style="color:var(--muted)">Auto</strong> — trigger fires daily, sends to all auto-mode leads.<br>
+                  <strong style="color:var(--muted)">Manual</strong> — you control send timing per-lead or globally.<br>
+                  You can override per-lead using the Seq Mode column in All Leads.
+                </div>
+              </div>
+            </div>
+            <!-- Quick send -->
+            <div class="panel">
+              <div class="ph"><div class="pt">Quick Send — All Pending</div></div>
+              <div class="pb">
+                <div class="g2">
+                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 1</div><div class="qc-subj">Nobody is going to tell you this</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(3)"><div class="qc-num">Email 3 · Day 2</div><div class="qc-subj">13 years. Here is what I found</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(4)"><div class="qc-num">Email 4 · Day 3</div><div class="qc-subj">Rolex does not chase you</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(5)"><div class="qc-num">Email 5 · Day 4 — OFFER</div><div class="qc-subj">This is what changes next</div><div class="qc-sub">Send to all pending</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Sequence grid -->
+          <div class="panel">
+            <div class="ph"><div class="pt">Per-Lead Email Status</div></div>
+            <div class="tbl-wrap">
+              <table class="seq-grid">
+                <thead><tr>
+                  <th>Name</th><th>Email</th><th>Enrolled</th>
+                  <th style="text-align:center">E1</th>
+                  <th style="text-align:center">E2</th>
+                  <th style="text-align:center">E3</th>
+                  <th style="text-align:center">E4</th>
+                  <th style="text-align:center">E5</th>
+                  <th style="text-align:center">Done</th>
+                  <th>Mode</th>
+                  <th>Actions</th>
+                </tr></thead>
+                <tbody id="seq-tbody"><tr><td colspan="11" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ EMAIL EDITOR ═══ -->
+      <div id="page-editor" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Email <em>Editor</em></div>
+            <div class="sh-right"><button class="btn" onclick="loadEmails()">↻ Reload from Sheet</button></div>
+          </div>
+          <div class="info-box">
+            Changes saved here update your <strong>Script Properties</strong> — the actual email text your leads receive. Use <strong>{{firstName}}</strong> anywhere in the body and it will be replaced with the lead's first name. Email 5 has extra fields for price and CTA links.
+          </div>
+          <div class="email-tabs" id="email-tabs">
+            <button class="etab active" onclick="switchEmail(1)">Email 1 · Day 0</button>
+            <button class="etab" onclick="switchEmail(2)">Email 2 · Day 1</button>
+            <button class="etab" onclick="switchEmail(3)">Email 3 · Day 2</button>
+            <button class="etab" onclick="switchEmail(4)">Email 4 · Day 3</button>
+            <button class="etab" onclick="switchEmail(5)">Email 5 · Day 4 — Offer</button>
+          </div>
+          <div id="email-panels">
+            <!-- injected by renderEmailPanels() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TRACKING ═══ -->
+      <div id="page-tracking" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Open & Click <em>Data</em></div>
+            <button class="btn pri" onclick="loadData()">↻ Refresh</button>
+          </div>
+          <div class="info-box">
+            <strong>Open tracking</strong> works via a 1×1 pixel in the HTML email — fires when the email client loads images. Gmail prompts users before loading images, so ~40–60% open rate is realistic.<br>
+            <strong>CTA click tracking</strong> (Email 5 only) — all links route through your Apps Script redirect before landing on your sales page. Every click is logged.<br>
+            <strong>UTM parameters</strong> are auto-appended to all Email 5 links: <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">utm_source=email_sequence&utm_medium=email&utm_campaign=dsm_email_5</code> — visible in Google Analytics.<br>
+            <strong>Time-on-email</strong> is not technically trackable in standard email — only web pages can measure it. The open count proxy is the best available signal.
+          </div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="ph"><div class="pt">📊 Open Rate by Email — Quick View</div><button class="btn sm" onclick="nav('stats')">Full Stats →</button></div>
+            <div class="pb" id="trk-openrate-bars">
+              <div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="pt">Email 5 — CTA Summary</div></div>
+            <div class="pb">
+              <div class="stats-grid" style="margin-bottom:0">
+                <div class="stat"><div class="stat-ey">E5 Sent</div><div class="stat-n" id="trk-e5-sent" style="color:var(--plat)">—</div><div class="stat-sub">Leads received offer</div></div>
+                <div class="stat"><div class="stat-ey">E5 Opened</div><div class="stat-n" style="color:var(--ret)" id="trk-e5-open">—</div><div class="stat-sub">Unique open events</div></div>
+                <div class="stat"><div class="stat-ey">CTA Clicks</div><div class="stat-n c-high" id="trk-e5-click">—</div><div class="stat-sub">Clicked offer link</div></div>
+                <div class="stat"><div class="stat-ey">Click Rate</div><div class="stat-n c-gold" id="trk-e5-rate">—</div><div class="stat-sub">Clicks / sent</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="pt">All Email Tracking Events</div></div>
+            <div class="pb" id="trk-full"><div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Awaiting data</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STATS & A/B ═══ -->
+      <div id="page-stats" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Stats &amp; <em>A/B Results</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          </div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="ph"><div class="pt">📐 Sequence Funnel</div></div>
+            <div class="pb">
+              <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px">
+                <div class="stat"><div class="stat-ey">Total Leads</div><div class="stat-n c-gold" id="fn-total">—</div></div>
+                <div class="stat"><div class="stat-ey">Completed All</div><div class="stat-n" id="fn-completed" style="color:var(--ret)">—</div><div class="stat-sub" id="fn-completion-rate"></div></div>
+                <div class="stat"><div class="stat-ey">Purchased</div><div class="stat-n c-high" id="fn-purchased">—</div><div class="stat-sub" id="fn-conv-rate"></div></div>
+                <div class="stat"><div class="stat-ey">Unsubscribed</div><div class="stat-n c-hot" id="fn-unsubs">—</div></div>
+              </div>
+              <div id="funnel-bar" style="margin-top:4px"></div>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="ph"><div class="pt">✉ Per-Email Performance</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>#</th><th>Label</th><th>Sent</th><th>Opened</th><th>Open Rate</th>
+                  <th>CTA Clicks</th><th>Click Rate</th><th>Avg Min to Open</th><th>Revenue After (₹)</th>
+                </tr></thead>
+                <tbody id="per-email-tbody"><tr><td colspan="9" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:16px">
+            <div class="ph">
+              <div class="pt">🧪 A/B Subject Line Results</div>
+              <div style="font-family:'Barlow',sans-serif;font-size:9px;color:var(--dim)">Set variant B subjects in Email Editor · 50/50 hash split per lead</div>
+            </div>
+            <div class="pb" id="ab-stats-body">
+              <div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No A/B data yet — set Subject B in Email Editor to start testing</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ RE-ENGAGEMENT ═══ -->
+      <div id="page-reengagement" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Re-engagement <em>Nudges</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          </div>
+          <div class="info-box">
+            Leads who signed up <strong>7+ days ago</strong> and never opened Email 1 receive an automatic nudge — <em>"Did this land in spam?"</em> — sent daily alongside the normal sequence. Also shows Hot Lead Fast-Track stats (Email 5 sent immediately on 3rd login).
+          </div>
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat"><div class="stat-ey">Leads Nudged</div><div class="stat-n" id="re-total" style="color:var(--gold)">—</div><div class="stat-sub">Total re-engagement sends</div></div>
+            <div class="stat"><div class="stat-ey">Cold (Never Opened E1)</div><div class="stat-n c-hot" id="re-cold">—</div><div class="stat-sub">Still unresponsive</div></div>
+            <div class="stat"><div class="stat-ey">⚡ Fast-Tracked</div><div class="stat-n c-high" id="re-fasttrack">—</div><div class="stat-sub">E5 sent early on 3rd login</div></div>
+          </div>
+          <div class="panel" style="margin-top:16px">
+            <div class="ph"><div class="pt">♻ Re-engagement Log</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>Email</th><th>Name</th><th>Signup Date</th><th>Days Since Signup</th><th>Nudge Sent At</th>
+                </tr></thead>
+                <tbody id="reeng-tbody"><tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Load data — requires Re-engagement sheet in your spreadsheet</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:16px">
+            <div class="ph"><div class="pt">🔥 Hot Lead Fast-Track Log</div></div>
+            <div class="pb" id="fasttrack-log">
+              <div style="font-size:11.5px;color:var(--dim);line-height:1.8">
+                Fast-tracked leads appear in the Sequence Tracker with <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">(fast-tracked)</code> markers in their E1–E4 slots. Email 5 was sent immediately when they hit their 3rd login. Check the Sequence Tracker for full per-lead status.
+              </div>
+              <div style="margin-top:10px" id="fasttrack-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div id="page-settings" class="page">
+        <div class="content">
+          <div class="sh"><div class="sh-title"><em>Configuration</em></div></div>
+          <div class="g2">
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">Connection</div></div>
+                <div class="pb">
+                  <div class="cfg-row"><div class="cfg-lbl">Apps Script Web App URL</div><input class="cfg-in" id="cfg-url" placeholder="https://script.google.com/macros/s/..."></div>
+                  <div class="cfg-row"><div class="cfg-lbl">Admin Password (set in Code.gs)</div><input class="cfg-in" id="cfg-pw" type="password" placeholder="your admin password"></div>
+                  <button class="btn pri" style="width:100%" onclick="saveConn()">Save & Reconnect</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">Trigger Management</div></div>
+                <div class="pb">
+                  <div class="info-box">The daily auto-trigger fires <strong>processDailyEmailSequence</strong> at 9AM. Only runs when global mode is <strong>auto</strong>.</div>
+                  <div style="display:flex;flex-direction:column;gap:9px">
+                    <button class="btn" style="width:100%" onclick="api('install_trigger').then(r=>toast(r.message,'ok'))">⚙ Install Daily Auto-Trigger</button>
+                    <button class="btn danger" style="width:100%" onclick="api('remove_trigger').then(r=>toast(r.message,'ok'))">🗑 Remove Daily Auto-Trigger</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PURCHASES ═══ -->
+      <div id="page-purchases" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Email <em>Revenue</em></div>
+            <div class="sh-right">
+              <button class="btn" onclick="showMarkPurchaseModal()">+ Log Purchase Manually</button>
+              <button class="btn pri" onclick="loadData()">↻ Refresh</button>
+            </div>
+          </div>
+          <div class="info-box" style="display:flex;align-items:center;gap:8px">
+            <span style="color:var(--gold)">✉</span> Showing only purchases originating from the <strong>email sequence</strong> — where <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">source = "email"</code>. Log manual purchases with source set to <strong>email</strong> to include them here.
+          </div>
+          <div class="stats-grid" id="purch-stats">
+            <div class="stat"><div class="stat-ey">Email Purchases</div><div class="stat-n c-high" id="ps-total">—</div><div class="stat-sub">Conversions via email</div></div>
+            <div class="stat"><div class="stat-ey">Email Revenue</div><div class="stat-n c-gold" id="ps-revenue">—</div><div class="stat-sub">₹ from email only</div></div>
+            <div class="stat"><div class="stat-ey">Avg Order Value</div><div class="stat-n" id="ps-aov" style="color:var(--ret)">—</div><div class="stat-sub">₹ per email purchase</div></div>
+            <div class="stat"><div class="stat-ey">Email Conv. Rate</div><div class="stat-n" id="ps-conv" style="color:var(--plat)">—</div><div class="stat-sub">Buyers / Email 5 sent</div></div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="pt">✉ Email Purchase Log</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>Purchased At</th><th>Name</th><th>Email</th>
+                  <th>Enrolled</th><th>Logins Before</th><th>Last Email</th><th>Amount (₹)</th><th>Notes</th>
+                </tr></thead>
+                <tbody id="purch-tbody"><tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Load data to see purchases</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FAILED EMAILS ═══ -->
+      <div id="page-failures" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Failed <em>Emails</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          </div>
+          <div class="info-box">
+            These are emails that failed to send — due to quota limits, bad addresses, or Gmail errors. Resolve them once you've retried or confirmed they bounced permanently.
+          </div>
+          <div class="panel">
+            <div class="ph">
+              <div class="pt">⚠ Send Failures</div>
+              <div id="fail-unresolved-count" style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;color:var(--hot)"></div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>Timestamp</th><th>Name</th><th>Email</th>
+                  <th>Email #</th><th>Error</th><th>Retries</th><th>Resolved</th><th>Action</th>
+                </tr></thead>
+                <tbody id="fail-tbody"><tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Load data to see failures</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DAILY SEND LOG ═══ -->
+      <div id="page-dailylog" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Daily <em>Send Log</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadData()">↻ Refresh</button></div>
+          </div>
+          <div class="info-box">
+            Every run of <strong>processDailyEmailSequence</strong> is logged here — whether triggered automatically at 9AM or manually from the dashboard.
+          </div>
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat"><div class="stat-ey">Total Runs Logged</div><div class="stat-n" id="dl-runs" style="color:var(--plat)">—</div></div>
+            <div class="stat"><div class="stat-ey">Emails Sent (all time)</div><div class="stat-n c-gold" id="dl-sent">—</div></div>
+            <div class="stat"><div class="stat-ey">Total Failures</div><div class="stat-n c-hot" id="dl-fails">—</div></div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="pt">📋 Run History</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>Date</th><th>Time</th><th>Emails Sent</th><th>Leads Processed</th><th>Failures</th><th>Triggered By</th>
+                </tr></thead>
+                <tbody id="dailylog-tbody"><tr><td colspan="6" style="text-align:center;color:var(--dim);padding:28px">Load data to see log</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ─── MODAL ─── -->
+<div class="mo" id="modal" onclick="moClose(event)">
+  <div class="mo-box">
+    <button class="mo-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <div class="mo-title" id="mo-title"></div>
+    <div class="mo-sub" id="mo-sub"></div>
+    <div id="mo-body"></div>
+    <div class="mo-acts" id="mo-acts"></div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════
+let SCRIPT_URL = localStorage.getItem('pa_url') || '';
+let PW         = localStorage.getItem('pa_pw')  || '';
+let leads=[], logins=[], hotLeads=[], sequence=[], tracking=[], emailData=[];
+let purchases=[], failures=[], dailyLog=[], statsData={};
+let contacted  = new Set(JSON.parse(localStorage.getItem('pa_contacted')||'[]'));
+let globalMode = localStorage.getItem('pa_mode') || 'auto';
+let sortCol = 'num', sortDir = 1;
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+window.onload = () => {
+  if (SCRIPT_URL) document.getElementById('url-in').value = SCRIPT_URL;
+  if (PW)         document.getElementById('pw-in').value  = PW;
+  if (SCRIPT_URL) { document.getElementById('cfg-url').value = SCRIPT_URL; }
+  if (PW)         { document.getElementById('cfg-pw').value  = PW; }
+  setGlobalMode(globalMode, false);
+  loadDemoData();
+  renderEmailPanels();
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  API CALL
+// ═══════════════════════════════════════════════════════════════════
+async function api(action, extra='') {
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL first','err'); throw new Error('No URL'); }
+  const url = SCRIPT_URL + '?action=' + action + '&pw=' + encodeURIComponent(PW) + extra;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LOAD DATA
+// ═══════════════════════════════════════════════════════════════════
+async function loadData() {
+  const urlEl = document.getElementById('url-in');
+  const pwEl  = document.getElementById('pw-in');
+  SCRIPT_URL = urlEl.value.trim();
+  PW         = pwEl.value.trim();
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL first','err'); return; }
+  localStorage.setItem('pa_url', SCRIPT_URL);
+  localStorage.setItem('pa_pw', PW);
+  document.getElementById('cfg-url').value = SCRIPT_URL;
+  document.getElementById('cfg-pw').value  = PW;
+
+  setConn('loading','Loading...');
+  toast('Connecting to Google Sheet...','');
+
+  try {
+    const [lRes, lgRes, hRes, sRes, tRes, pRes, fRes, stRes, dlRes] = await Promise.allSettled([
+      api('get_leads'), api('get_logins'), api('get_hot'), api('get_sequence'), api('get_tracking'),
+      api('get_purchases'), api('get_failures'), api('get_stats'), api('get_daily_log')
+    ]);
+    let ok = false;
+    if (lRes.status==='fulfilled'  && lRes.value?.data)  { leads     = lRes.value.data;  ok=true; }
+    if (lgRes.status==='fulfilled' && lgRes.value?.data) { logins    = lgRes.value.data; }
+    if (hRes.status==='fulfilled'  && hRes.value?.data)  { hotLeads  = hRes.value.data;  }
+    if (sRes.status==='fulfilled'  && sRes.value?.data)  { sequence  = sRes.value.data;  }
+    if (tRes.status==='fulfilled'  && tRes.value?.data)  { tracking  = tRes.value.data;  }
+    if (pRes.status==='fulfilled'  && pRes.value?.data)  { purchases = pRes.value.data; if(pRes.value.total!=null) document.getElementById('ps-total').textContent=pRes.value.total; if(pRes.value.revenue!=null) document.getElementById('ps-revenue').textContent='₹'+pRes.value.revenue.toLocaleString(); }
+    if (fRes.status==='fulfilled'  && fRes.value?.data)  { failures  = fRes.value.data;  }
+    if (stRes.status==='fulfilled' && stRes.value)       { statsData = stRes.value;       }
+    if (dlRes.status==='fulfilled' && dlRes.value?.data) { dailyLog  = dlRes.value.data; }
+
+    if (ok) {
+      setConn('live','Live — '+new Date().toLocaleTimeString());
+      toast('Data loaded','ok');
+      renderAll();
+    } else {
+      toast('Connected but no data returned — check ADMIN_PASSWORD in Code.gs','err');
+      setConn('err','Auth error');
+      loadDemoData();
+    }
+  } catch(e) {
+    toast('Connection failed — check URL and deploy settings','err');
+    setConn('err','Failed');
+    loadDemoData();
+  }
+}
+
+async function loadEmails() {
+  if (!SCRIPT_URL) return;
+  try {
+    const res = await api('get_emails');
+    if (res.data) {
+      emailData = res.data;
+      // fetch subjectB from props — they come as emailN_subject_b via get_emails if we extend, 
+      // for now we re-render and the fields default to blank (user fills them)
+      renderEmailPanels();
+      toast('Emails loaded','ok');
+    }
+  } catch(e) { toast('Could not load email data','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DEMO DATA
+// ═══════════════════════════════════════════════════════════════════
+function loadDemoData() {
+  const names = ['James Holden','Marcus Webb','Adrian Cole','Sam Rivers','Tyler Knox','Dean Ashford','Kai Bennett','Owen Drake'];
+  const stats  = ['🔥 HOT — Reach Out Now','🔥 HOT — Reach Out Now','⚡ High Interest','⚡ High Interest','Returning','Active','Active','Active'];
+  const lgs    = [7,4,3,2,2,1,1,1];
+  leads = names.map((n,i)=>({num:i+1,name:n,email:n.toLowerCase().replace(/\s+/g,'.')+`@email.com`,enrolled:`${10+i} Apr 2025`,logins:lgs[i],lastLogin:`${20-i} Apr 2025`,status:stats[i],daysSince:i+2,seqMode:'auto',engagementScore:lgs[i]*2+Math.max(0,lgs[i]-2)*3}));
+  logins = leads.flatMap(l=>Array.from({length:l.logins},(_,j)=>({name:l.name,email:l.email,event:`Login #${j+1}`,date:`${20-j} Apr 2025`,time:`${12+j%8}:0${j}:00`}))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30);
+  sequence = leads.map(l=>({name:l.name,email:l.email,signupDate:l.enrolled,e1:true,e2:l.logins>1,e3:l.logins>2,e4:l.logins>3,e5:l.logins>5,complete:l.logins>5,mode:l.seqMode}));
+  tracking = leads.slice(0,5).map(l=>({email:l.email,emailNum:5,sentAt:'20 Apr 2025 09:01',opened:l.logins>2,openCount:l.logins>2?l.logins-1:0,firstOpenAt:'20 Apr 2025 10:15',lastOpenAt:'21 Apr 2025 08:45',ctaClicked:l.logins>4,ctaClickAt:l.logins>4?'21 Apr 2025 11:02':'',ctaClickCount:l.logins>4?1:0}));
+  purchases = [
+    {purchasedAt:'18 Apr 2025 14:22',email:'tyler.knox@email.com',name:'Tyler Knox',enrolledDate:'10 Apr 2025',loginsBeforePurchase:2,lastEmailReceived:5,amount:999,source:'email',notes:''},
+    {purchasedAt:'19 Apr 2025 09:11',email:'james.holden@email.com',name:'James Holden',enrolledDate:'10 Apr 2025',loginsBeforePurchase:7,lastEmailReceived:5,amount:999,source:'email',notes:'Hot lead converted same day'}
+  ];
+  failures = [
+    {ts:'17 Apr 2025 09:04',email:'dean.ashford@email.com',name:'Dean Ashford',emailNum:2,error:'Quota exceeded',retries:2,resolved:false},
+    {ts:'18 Apr 2025 09:01',email:'kai.bennett@email.com',name:'Kai Bennett',emailNum:1,error:'Invalid address',retries:1,resolved:true}
+  ];
+  dailyLog = [
+    {date:'21 Apr 2025',time:'09:00:05',emailsSent:3,leadsProcessed:5,failures:0,triggeredBy:'auto-trigger'},
+    {date:'20 Apr 2025',time:'09:00:03',emailsSent:2,leadsProcessed:4,failures:1,triggeredBy:'auto-trigger'},
+    {date:'19 Apr 2025',time:'14:22:10',emailsSent:1,leadsProcessed:1,failures:0,triggeredBy:'dashboard'},
+    {date:'18 Apr 2025',time:'09:00:01',emailsSent:0,leadsProcessed:0,failures:5,triggeredBy:'auto-trigger — QUOTA ABORT'},
+  ];
+  statsData = {
+    emailStats:[
+      {emailNum:1,label:'The Mirror',sent:8,opened:5,openRate:63,ctaClicked:0,ctaRate:0,avgMinsToOpen:22,buyersAfterThisEmail:0,revenueAfterThisEmail:0},
+      {emailNum:2,label:'The Wound',sent:5,opened:3,openRate:60,ctaClicked:0,ctaRate:0,avgMinsToOpen:45,buyersAfterThisEmail:0,revenueAfterThisEmail:0},
+      {emailNum:3,label:'The Transformation',sent:3,opened:2,openRate:67,ctaClicked:0,ctaRate:0,avgMinsToOpen:30,buyersAfterThisEmail:0,revenueAfterThisEmail:0},
+      {emailNum:4,label:'The One Thing',sent:2,opened:2,openRate:100,ctaClicked:0,ctaRate:0,avgMinsToOpen:15,buyersAfterThisEmail:0,revenueAfterThisEmail:0},
+      {emailNum:5,label:'The Offer',sent:5,opened:3,openRate:60,ctaClicked:2,ctaRate:67,avgMinsToOpen:12,buyersAfterThisEmail:2,revenueAfterThisEmail:1998}
+    ],
+    abStats:{'email1_A':{sent:4,opened:3,openRate:75},'email1_B':{sent:4,opened:2,openRate:50}},
+    funnel:{totalLeads:8,reachedEmail1:8,reachedEmail2:5,reachedEmail3:3,reachedEmail4:2,reachedEmail5:5,completedAll:2,purchased:2,unsubscribed:0,completionRate:25,conversionRate:40},
+    revenue:{totalPurchases:2,totalRevenue:1998,avgOrderValue:999}
+  };
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════════════════
+function renderAll() {
+  // Compute engagementScore from tracking + logins for any lead missing it
+  leads.forEach(l => {
+    if (l.engagementScore == null) {
+      const trk = tracking.filter(t => (t.email||'').toLowerCase() === l.email.toLowerCase());
+      const opens  = trk.reduce((s,t) => s + (+t.openCount||0), 0);
+      const clicks = trk.reduce((s,t) => s + (+t.ctaClickCount||0), 0);
+      l.engagementScore = (opens * 1) + (clicks * 3) + ((+l.logins||0) * 2);
+    }
+  });
+  renderStats(); renderHotLeads(); renderLeadsTable();
+  renderLogins(); renderSequence(); renderTracking();
+  renderPurchases(); renderFailures(); renderDailyLog();
+  renderStatsPage(); renderReengagement();
+  updateBadges();
+}
+
+function updateBadges() {
+  const hotCount  = leads.filter(l=>+l.logins>=3).length;
+  const failCount = failures.filter(f=>!f.resolved).length;
+  document.getElementById('nb-hot').textContent   = hotCount;
+  document.getElementById('nb-total').textContent = leads.length;
+  document.getElementById('nb-purch').textContent = purchases.length;
+  const failBadge = document.getElementById('nb-fail');
+  if (failCount > 0) { failBadge.textContent = failCount; failBadge.style.display = ''; }
+  else { failBadge.style.display = 'none'; }
+}
+
+function renderStats() {
+  document.getElementById('s-total').textContent = leads.length;
+  document.getElementById('s-hot').textContent   = leads.filter(l=>+l.logins>=3).length;
+  document.getElementById('s-high').textContent  = leads.filter(l=>+l.logins===2).length;
+  const opens = tracking.filter(t=>t.opened).length;
+  document.getElementById('s-opens').textContent = opens || '—';
+  const rev = statsData.revenue;
+  const revEl = document.getElementById('s-revenue');
+  if (revEl) {
+    const emailPurchases = purchases.filter(p => !p.source || p.source === 'email');
+    const emailRev = emailPurchases.reduce((s,p)=>s+(+p.amount||0),0);
+    revEl.textContent = emailPurchases.length ? '₹'+emailRev.toLocaleString() : '—';
+  }
+}
+
+// ── HOT LEADS ──
+function renderHotLeads() {
+  const hot = leads.filter(l=>+l.logins>=3).sort((a,b)=>+b.logins-+a.logins);
+  const empty = `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No hot leads yet</div></div>`;
+  const html = hot.length ? hot.map(hlRow).join('') : empty;
+  document.getElementById('hot-preview').innerHTML = hot.slice(0,3).map(hlRow).join('') || empty;
+  document.getElementById('hot-full').innerHTML = html;
+}
+
+function hlRow(l) {
+  const init = l.name.split(' ').map(n=>n[0]).join('').slice(0,2);
+  const isHot = +l.logins>=3, isDone = contacted.has(l.email);
+  const isVeryHot = +l.logins>=6;
+  const modeTag = `<span class="tag ${l.seqMode==='auto'?'t-auto':l.seqMode==='paused'?'t-paused':'t-manual'}">${l.seqMode||'auto'}</span>`;
+  return `<div class="hl-row${isVeryHot?'':' high'}" onclick="openLeadModal('${l.email}')">
+    <div class="hl-av${isVeryHot?' ':' av-high'}">${init}</div>
+    <div class="hl-info">
+      <div class="hl-name">${l.name}</div>
+      <div class="hl-email">${l.email}</div>
+      <div class="hl-meta">
+        <span class="tag ${isVeryHot?'t-hot':'t-high'}">${isVeryHot?'🔥 HOT':'⚡ HIGH'}</span>
+        <span class="hl-logins">Logins: <b>${l.logins}</b></span>
+        ${modeTag}
+      </div>
+    </div>
+    <div class="hl-actions">
+      <button class="reach-btn${isDone?' done':''}" onclick="toggleContacted(event,'${l.email}')">${isDone?'✓ Contacted':'👉 Reach Out'}</button>
+      <select class="mode-sel" onchange="setLeadMode('${l.email}',this.value)" onclick="event.stopPropagation()">
+        <option value="auto"   ${(l.seqMode||'auto')==='auto'?'selected':''}>Auto</option>
+        <option value="manual" ${l.seqMode==='manual'?'selected':''}>Manual</option>
+        <option value="paused" ${l.seqMode==='paused'?'selected':''}>Paused</option>
+      </select>
+    </div>
+  </div>`;
+}
+
+// ── LEADS TABLE ──
+let filteredLeads = [];
+function renderLeadsTable() {
+  const q = (document.getElementById('lead-srch')?.value||'').toLowerCase();
+  filteredLeads = q ? leads.filter(l=>l.name.toLowerCase().includes(q)||l.email.toLowerCase().includes(q)) : [...leads];
+  filteredLeads.sort((a,b)=>{
+    let av=a[sortCol],bv=b[sortCol];
+    if (typeof av==='string') av=av.toLowerCase(),bv=bv.toLowerCase();
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+  const tbody = document.getElementById('leads-tbody');
+  if (!filteredLeads.length) { tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:28px">No leads found</td></tr>`; return; }
+  tbody.innerHTML = filteredLeads.map(l=>{
+    const sc = l.status?.includes('HOT')?'sb-hot':l.status?.includes('High')?'sb-high':l.status==='Returning'?'sb-ret':'sb-act';
+    const score = l.engagementScore != null ? l.engagementScore : '—';
+    const scoreCls = score>=10?'color:var(--high);font-weight:700':score>=5?'color:var(--gold)':'color:var(--dim)';
+    return `<tr>
+      <td style="color:var(--dim)">${l.num||'—'}</td>
+      <td><strong style="font-weight:500">${l.name}</strong></td>
+      <td style="color:var(--dim);font-size:10.5px">${l.email}</td>
+      <td style="color:var(--dim);font-size:10.5px">${l.enrolled||'—'}</td>
+      <td style="text-align:center;font-family:'Barlow',sans-serif;font-weight:700;color:${+l.logins>=3?'var(--hot)':+l.logins===2?'var(--gold)':'var(--muted)'}">${l.logins||0}</td>
+      <td style="font-size:10.5px;color:var(--dim)">${l.lastLogin||'—'}</td>
+      <td><span class="tag ${sc}" style="font-size:7.5px;padding:2px 8px;border-radius:20px">${l.status||'Active'}</span></td>
+      <td style="text-align:center;color:var(--dim)">${l.daysSince||0}d</td>
+      <td style="text-align:center;font-family:'Barlow',sans-serif;font-weight:700;${scoreCls}" title="Score = opens×1 + CTA clicks×3 + logins×2">${score}</td>
+      <td>
+        <select class="mode-sel" onchange="setLeadMode('${l.email}',this.value)">
+          <option value="auto"   ${(l.seqMode||'auto')==='auto'?'selected':''}>Auto</option>
+          <option value="manual" ${l.seqMode==='manual'?'selected':''}>Manual</option>
+          <option value="paused" ${l.seqMode==='paused'?'selected':''}>Paused</option>
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function filterLeads() { renderLeadsTable(); }
+function sortLeads(col) { sortDir = sortCol===col?-sortDir:1; sortCol=col; renderLeadsTable(); }
+
+// ── LOGINS ──
+function renderLogins() {
+  const html = !logins.length ? `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No login events yet</div></div>` :
+    logins.map(e=>{
+      const n = +(e.event?.match(/\d+/)?.[0]||0);
+      const dc = n>=3?'lf-hot':n===2?'lf-high':'lf-norm';
+      return `<div class="lf-row"><div class="lf-dot ${dc}"></div><div class="lf-txt"><strong>${e.name}</strong> — ${e.event||'Login'}</div><div class="lf-time">${e.date||''} ${e.time||''}</div></div>`;
+    }).join('');
+  document.getElementById('login-preview').innerHTML = logins.slice(0,6).map(e=>{
+    const n = +(e.event?.match(/\d+/)?.[0]||0);
+    const dc = n>=3?'lf-hot':n===2?'lf-high':'lf-norm';
+    return `<div class="lf-row"><div class="lf-dot ${dc}"></div><div class="lf-txt"><strong>${e.name}</strong> — ${e.event||'Login'}</div><div class="lf-time">${e.time||''}</div></div>`;
+  }).join('') || `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No recent logins</div></div>`;
+  document.getElementById('login-full').innerHTML = html;
+}
+
+// ── SEQUENCE ──
+function renderSequence() {
+  const data = sequence.length ? sequence : leads.map(l=>({name:l.name,email:l.email,signupDate:l.enrolled,e1:true,e2:+l.logins>1,e3:+l.logins>2,e4:+l.logins>3,e5:+l.logins>5,complete:+l.logins>5,mode:l.seqMode||'auto'}));
+  const seqPreview = data.slice(0,6).map(seqRow).join('') || `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No leads in sequence</div></div>`;
+  document.getElementById('seq-preview').innerHTML = seqPreview;
+
+  if (!data.length) { document.getElementById('seq-tbody').innerHTML=`<tr><td colspan="11" style="text-align:center;color:var(--dim);padding:28px">No data</td></tr>`; return; }
+  document.getElementById('seq-tbody').innerHTML = data.map(s=>{
+    const emails = [s.e1,s.e2,s.e3,s.e4,s.e5];
+    const pendingIdx = emails.findIndex(e=>!e);
+    const dots = emails.map((sent,i)=>{
+      const cls = sent?'ed-sent':i===pendingIdx?'ed-pending':'ed-none';
+      const label = sent?'✓':(i===pendingIdx?'…':(i+1));
+      return `<td style="text-align:center"><div class="email-dot ${cls}" title="${sent?'Sent':'Pending'}">${label}</div></td>`;
+    }).join('');
+    const modeTag = `<span class="tag ${s.mode==='auto'?'t-auto':s.mode==='paused'?'t-paused':'t-manual'}">${s.mode||'auto'}</span>`;
+    return `<tr>
+      <td><strong style="font-weight:500">${s.name}</strong></td>
+      <td style="font-size:10.5px;color:var(--dim)">${s.email}</td>
+      <td style="font-size:10.5px;color:var(--dim)">${s.signupDate||'—'}</td>
+      ${dots}
+      <td style="text-align:center">${s.complete?'<span class="tag t-high">✓ Done</span>':'<span style="color:var(--dim);font-size:10.5px">—</span>'}</td>
+      <td>
+        <select class="mode-sel" onchange="setLeadMode('${s.email}',this.value)">
+          <option value="auto"   ${(s.mode||'auto')==='auto'?'selected':''}>Auto</option>
+          <option value="manual" ${s.mode==='manual'?'selected':''}>Manual</option>
+          <option value="paused" ${s.mode==='paused'?'selected':''}>Paused</option>
+        </select>
+      </td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap;padding:9px 10px">
+        ${!s.e2?`<button class="btn sm" onclick="sendToLead(2,'${s.email}')">Send E2</button>`:''}
+        ${!s.e3?`<button class="btn sm" onclick="sendToLead(3,'${s.email}')">Send E3</button>`:''}
+        ${!s.e4?`<button class="btn sm" onclick="sendToLead(4,'${s.email}')">Send E4</button>`:''}
+        ${!s.e5?`<button class="btn sm" onclick="sendToLead(5,'${s.email}')">Send E5</button>`:''}
+        ${(s.e1&&s.e2&&s.e3&&s.e4&&s.e5)?'<span style="font-size:10.5px;color:var(--dim)">All sent</span>':''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function seqRow(s) {
+  const emails = [s.e1,s.e2,s.e3,s.e4,s.e5];
+  const dots = emails.map((sent,i)=>`<div class="email-dot ${sent?'ed-sent':''}" style="width:22px;height:22px;font-size:7.5px">${sent?'✓':i+1}</div>`).join('');
+  return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(24,37,64,.38)">
+    <div style="font-size:12px;font-weight:500;width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</div>
+    <div style="display:flex;gap:4px">${dots}</div>
+    ${s.complete?'<span class="tag t-high" style="font-size:7px;margin-left:auto">✓</span>':''}
+  </div>`;
+}
+
+// ── TRACKING ──
+function renderTracking() {
+  // E5 stats
+  const e5 = tracking.filter(t=>+t.emailNum===5);
+  const sent   = e5.length;
+  const opened = e5.filter(t=>t.opened).length;
+  const clicks = e5.filter(t=>t.ctaClicked).length;
+  const rate   = sent ? Math.round(clicks/sent*100) : 0;
+  document.getElementById('trk-e5-sent').textContent  = sent   || '—';
+  document.getElementById('trk-e5-open').textContent  = opened || '—';
+  document.getElementById('trk-e5-click').textContent = clicks || '—';
+  document.getElementById('trk-e5-rate').textContent  = sent ? rate+'%' : '—';
+
+  // Per-email open rate bars (from statsData or calculate from tracking)
+  const openBarsEl = document.getElementById('trk-openrate-bars');
+  if (openBarsEl) {
+    const emailStats = statsData.emailStats || [];
+    if (emailStats.length) {
+      openBarsEl.innerHTML = emailStats.map(e=>{
+        const pct = e.openRate || 0;
+        const clr = pct>=60?'var(--high)':pct>=40?'var(--gold)':'var(--ret)';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(24,37,64,.3)">
+          <div style="font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;color:var(--dim);width:22px">E${e.emailNum}</div>
+          <div style="font-size:11px;color:var(--muted);width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.label}</div>
+          <div style="flex:1;background:var(--surface);border-radius:3px;height:6px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${clr};border-radius:3px;transition:width .5s"></div>
+          </div>
+          <div style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;color:${clr};width:36px;text-align:right">${pct}%</div>
+          <div style="font-size:10.5px;color:var(--dim);width:70px;text-align:right">${e.opened}/${e.sent} sent</div>
+        </div>`;
+      }).join('');
+    } else {
+      // fallback: calculate from tracking array
+      const byEmail = {};
+      tracking.forEach(t=>{ const n=+t.emailNum; if(!byEmail[n]) byEmail[n]={sent:0,opened:0}; byEmail[n].sent++; if(t.opened) byEmail[n].opened++; });
+      const rows = Object.entries(byEmail).sort((a,b)=>+a[0]-+b[0]);
+      if (rows.length) {
+        openBarsEl.innerHTML = rows.map(([n,d])=>{
+          const pct = d.sent>0?Math.round(d.opened/d.sent*100):0;
+          const clr = pct>=60?'var(--high)':pct>=40?'var(--gold)':'var(--ret)';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(24,37,64,.3)">
+            <div style="font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;color:var(--dim);width:22px">E${n}</div>
+            <div style="flex:1;background:var(--surface);border-radius:3px;height:6px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:${clr};border-radius:3px"></div>
+            </div>
+            <div style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;color:${clr};width:36px;text-align:right">${pct}%</div>
+          </div>`;
+        }).join('');
+      } else {
+        openBarsEl.innerHTML = `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No tracking data yet</div></div>`;
+      }
+    }
+  }
+
+  // Lead name lookup
+  const nameMap = Object.fromEntries(leads.map(l=>[l.email.toLowerCase(), l.name]));
+
+  const html = !tracking.length ? `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No tracking data yet — emails must be sent in HTML mode via updated Code.gs</div></div>` :
+    tracking.map(t=>{
+      const name = nameMap[t.email?.toLowerCase()] || t.email;
+      return `<div class="trk-row">
+        <div class="trk-name">${name}</div>
+        <div class="trk-email">${t.email}</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:8.5px;color:var(--dim);width:40px;text-align:center">E${t.emailNum}</div>
+        <div class="trk-stat">
+          <span class="trk-pill ${t.opened?'tp-open':'tp-no'}">${t.opened?`👁 ${t.openCount}×`:'Not opened'}</span>
+          ${+t.emailNum===5?`<span class="trk-pill ${t.ctaClicked?'tp-click':'tp-no'}">${t.ctaClicked?`✓ CTA ×${t.ctaClickCount}`:'No click'}</span>`:''}
+        </div>
+        <div style="font-size:10px;color:var(--dim)">${t.firstOpenAt||t.sentAt||'—'}</div>
+      </div>`;
+    }).join('');
+
+  document.getElementById('trk-full').innerHTML = html;
+  document.getElementById('trk-preview').innerHTML = tracking.slice(0,5).map(t=>{
+    const name = nameMap[t.email?.toLowerCase()]||t.email;
+    return `<div class="trk-row">
+      <div class="trk-name">${name}</div>
+      <div style="font-family:'Barlow',sans-serif;font-size:8px;color:var(--dim);width:30px">E${t.emailNum}</div>
+      <div class="trk-stat">
+        <span class="trk-pill ${t.opened?'tp-open':'tp-no'}">${t.opened?`👁 ${t.openCount}×`:'—'}</span>
+        ${+t.emailNum===5?`<span class="trk-pill ${t.ctaClicked?'tp-click':'tp-no'}">${t.ctaClicked?'✓ CTA':'—'}</span>`:''}
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No tracking data</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  EMAIL EDITOR
+// ═══════════════════════════════════════════════════════════════════
+const defaultSubjects = [
+  "She wasn't the problem. You just didn't know what you didn't know.",
+  "Nobody is going to tell you this. So I will.",
+  "13 years. Here is what I actually found.",
+  "Rolex does not chase you. Neither should you.",
+  "This is what changes next."
+];
+
+function renderEmailPanels() {
+  const panels = document.getElementById('email-panels');
+  panels.innerHTML = [1,2,3,4,5].map(n=>{
+    const d = emailData[n-1] || {};
+    const subj = d.subject || defaultSubjects[n-1];
+    const body = (d.body && d.body !== '(default — edit to customise)') ? d.body : '';
+    const e5 = n===5 ? `
+      <div class="e5-extras">
+        <div class="e5-title">Email 5 — Price & CTA Settings</div>
+        <div class="e5-grid">
+          <div class="field-grp"><div class="field-lbl">Current Price</div><input class="field-in" id="e5-price" value="${d.price||'999'}" placeholder="999"></div>
+          <div class="field-grp"><div class="field-lbl">Next Price (urgency)</div><input class="field-in" id="e5-price-next" value="${d.priceNext||'1999'}" placeholder="1999"></div>
+          <div class="field-grp"><div class="field-lbl">Get Access URL (tracked)</div><input class="field-in" id="e5-cta" value="${d.ctaUrl||'persuasionacademybyra.com'}" placeholder="persuasionacademybyra.com"></div>
+          <div class="field-grp"><div class="field-lbl">Info Page URL (tracked)</div><input class="field-in" id="e5-info" value="${d.infoUrl||'dsm.persuasionacademybyra.com'}" placeholder="dsm.persuasionacademybyra.com"></div>
+        </div>
+      </div>` : '';
+    return `<div class="ep${n===1?' active':''}" id="ep-${n}">
+      ${e5}
+      <div class="field-grp"><div class="field-lbl">Subject Line — Variant A (default)</div><input class="field-in" id="e${n}-subj" value="${subj.replace(/"/g,'&quot;')}" placeholder="Email ${n} subject..."></div>
+      <div class="field-grp">
+        <div class="field-lbl" style="display:flex;align-items:center;gap:8px">Subject Line — Variant B <span style="font-family:'Barlow',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(201,149,58,.1);color:var(--gold);border:1px solid rgba(201,149,58,.2)">A/B Test</span></div>
+        <input class="field-in" id="e${n}-subj-b" value="${(d.subjectB||'').replace(/"/g,'&quot;')}" placeholder="Leave blank to disable A/B testing for this email...">
+        <div style="font-size:10.5px;color:var(--dim);margin-top:4px">50% of leads get variant B (deterministic hash split). View results in Stats &amp; A/B page.</div>
+      </div>
+      <div class="field-grp">
+        <div class="field-lbl">Email Body — use {{firstName}} for personalisation</div>
+        <textarea class="field-in" id="e${n}-body" placeholder="Paste or type the full email body here. Use {{firstName}} where you want the lead's first name to appear.\n\nLeave blank to use the default body from Code.gs.">${body}</textarea>
+      </div>
+      <div style="display:flex;gap:9px;align-items:center">
+        <button class="btn pri" onclick="saveEmail(${n})">Save Email ${n} to Sheet</button>
+        <span style="font-size:11px;color:var(--dim)">Saves to Script Properties — live immediately</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function switchEmail(n) {
+  document.querySelectorAll('.ep').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.etab').forEach((t,i)=>t.classList.toggle('active',i===n-1));
+  document.getElementById('ep-'+n).classList.add('active');
+}
+
+async function saveEmail(n) {
+  if (!SCRIPT_URL) { toast('Connect your Apps Script URL first','err'); return; }
+  const subj   = document.getElementById('e'+n+'-subj')?.value || '';
+  const subjB  = document.getElementById('e'+n+'-subj-b')?.value || '';
+  const body   = document.getElementById('e'+n+'-body')?.value || '';
+  let extra = `&num=${n}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  if (subjB) extra += `&subject_b=${encodeURIComponent(subjB)}`;
+  if (n===5) {
+    extra += `&price=${encodeURIComponent(document.getElementById('e5-price')?.value||'')}`;
+    extra += `&price_next=${encodeURIComponent(document.getElementById('e5-price-next')?.value||'')}`;
+    extra += `&cta_url=${encodeURIComponent(document.getElementById('e5-cta')?.value||'')}`;
+    extra += `&info_url=${encodeURIComponent(document.getElementById('e5-info')?.value||'')}`;
+  }
+  try {
+    const res = await api('save_email', extra);
+    toast(res.message || 'Saved!', res.status==='success'?'ok':'err');
+  } catch(e) { toast('Save failed','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SEQUENCE ACTIONS
+// ═══════════════════════════════════════════════════════════════════
+async function setLeadMode(email, mode) {
+  // Update local state immediately
+  const l = leads.find(x=>x.email===email);
+  if (l) l.seqMode = mode;
+  const s = sequence.find(x=>x.email===email);
+  if (s) s.mode = mode;
+
+  if (SCRIPT_URL) {
+    try {
+      await api('set_lead_mode', `&email=${encodeURIComponent(email)}&mode=${mode}`);
+      toast('Mode set to '+mode, 'ok');
+    } catch(e) { toast('Could not save to sheet — set locally only','err'); }
+  } else {
+    toast('Mode set locally (demo mode)','ok');
+  }
+  renderSequence(); renderHotLeads(); renderLeadsTable();
+}
+
+function setGlobalMode(m, save=true) {
+  globalMode = m;
+  if (save) localStorage.setItem('pa_mode', m);
+  document.getElementById('mb-auto')?.classList.toggle('active', m==='auto');
+  document.getElementById('mb-man')?.classList.toggle('active', m==='manual');
+}
+
+async function runManual() {
+  if (!SCRIPT_URL) { toast('Connect Apps Script URL first','err'); return; }
+  try {
+    const r = await api('manual_run');
+    toast(r.message||'Done', 'ok');
+    setTimeout(loadData, 1500);
+  } catch(e) { toast('Failed','err'); }
+}
+
+function confirmSend(num) {
+  showModal('Send Email '+num+' to All Pending', 'This sends Email '+num+' to every lead who hasn\'t received it and hasn\'t completed the sequence.', [
+    {label:'Cancel', cls:'btn ghost', action:()=>closeModal()},
+    {label:'Send Now', cls:'btn pri', action:async()=>{ closeModal(); await sendEmailToAll(num); }}
+  ]);
+}
+
+async function sendEmailToAll(num) {
+  if (!SCRIPT_URL) { toast('Connect Apps Script URL first','err'); return; }
+  try {
+    const r = await api('send_email', `&num=${num}`);
+    toast(r.message||'Sent', 'ok');
+    setTimeout(loadData, 1500);
+  } catch(e) { toast('Failed','err'); }
+}
+
+async function sendToLead(num, email) {
+  if (!SCRIPT_URL) { toast('Connect Apps Script URL first','err'); return; }
+  try {
+    const r = await api('send_email', `&num=${num}&email=${encodeURIComponent(email)}`);
+    toast(r.message||'Sent', 'ok');
+    setTimeout(loadData, 1500);
+  } catch(e) { toast('Failed','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CONTACT TOGGLE
+// ═══════════════════════════════════════════════════════════════════
+function toggleContacted(e, email) {
+  e.stopPropagation();
+  contacted.has(email) ? contacted.delete(email) : contacted.add(email);
+  localStorage.setItem('pa_contacted', JSON.stringify([...contacted]));
+  renderHotLeads();
+  toast(contacted.has(email)?'✓ Marked as contacted':'Marked as not contacted', contacted.has(email)?'ok':'');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LEAD MODAL
+// ═══════════════════════════════════════════════════════════════════
+function openLeadModal(email) {
+  const l = leads.find(x=>x.email===email);
+  if (!l) return;
+  const trk = tracking.filter(t=>t.email?.toLowerCase()===email.toLowerCase());
+  const e5t = trk.find(t=>+t.emailNum===5);
+  const sc = l.status?.includes('HOT')?'var(--hot)':l.status?.includes('High')?'var(--gold)':'var(--text)';
+  const alreadyPurchased = l.status?.includes('Purchased') || l.status?.includes('💰');
+  const alreadyReplied   = l.status?.includes('Replied')  || l.status?.includes('💬');
+  showModal(l.name, l.email, [
+    {label:contacted.has(email)?'Unmark Contacted':'✓ Mark Contacted', cls:'btn', action:()=>{toggleContacted({stopPropagation:()=>{}},email);closeModal();}},
+    {label:alreadyReplied?'✓ Replied':'💬 Mark Replied', cls:'btn', action:async()=>{ await markReplied(email); closeModal(); }},
+    {label:alreadyPurchased?'💰 Purchased':'💰 Mark Purchased', cls:alreadyPurchased?'btn ghost':'btn pri', action:()=>{ if(!alreadyPurchased) showMarkPurchaseModalForEmail(email); else closeModal(); }},
+    {label:'Close', cls:'btn ghost', action:closeModal}
+  ], `
+    <div class="g2" style="margin-bottom:12px">
+      <div style="padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div class="cfg-lbl">Status</div>
+        <div style="font-size:13px;font-weight:500;color:${sc}">${l.status||'Active'}</div>
+      </div>
+      <div style="padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div class="cfg-lbl">Logins</div>
+        <div style="font-size:22px;font-family:'Playfair Display',serif;font-weight:700">${l.logins}</div>
+      </div>
+      <div style="padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div class="cfg-lbl">Enrolled</div>
+        <div style="font-size:12px">${l.enrolled||'—'}</div>
+      </div>
+      <div style="padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div class="cfg-lbl">Days Since Signup</div>
+        <div style="font-size:12px">${l.daysSince||0} days</div>
+      </div>
+      <div style="padding:11px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div class="cfg-lbl">Engagement Score</div>
+        <div style="font-size:22px;font-family:'Playfair Display',serif;font-weight:700;color:${(l.engagementScore||0)>=10?'var(--high)':(l.engagementScore||0)>=5?'var(--gold)':'var(--dim)'}">${l.engagementScore ?? '—'}</div>
+        <div style="font-size:10px;color:var(--dim)">opens×1 + clicks×3 + logins×2</div>
+      </div>
+    </div>
+    ${trk.length ? `<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:12px">
+      <div class="cfg-lbl" style="margin-bottom:8px">Email Tracking (all emails)</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${trk.map(t=>`<div style="display:flex;align-items:center;gap:8px;font-size:11.5px">
+          <span style="font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;color:var(--dim);width:20px">E${t.emailNum}</span>
+          <span class="trk-pill ${t.opened?'tp-open':'tp-no'}">${t.opened?`👁 ${t.openCount}×`:'Not opened'}</span>
+          ${+t.emailNum===5?`<span class="trk-pill ${t.ctaClicked?'tp-click':'tp-no'}">${t.ctaClicked?`✓ CTA ×${t.ctaClickCount}`:'No CTA click'}</span>`:''}
+          ${t.firstOpenAt?`<span style="font-size:10px;color:var(--dim)">First: ${t.firstOpenAt}</span>`:''}
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:12px">
+      <div class="cfg-lbl" style="margin-bottom:8px">Sequence Mode</div>
+      <select class="mode-sel" style="width:100%;padding:8px" onchange="setLeadMode('${email}',this.value);closeModal()">
+        <option value="auto"   ${(l.seqMode||'auto')==='auto'?'selected':''}>Auto — daily trigger handles this lead</option>
+        <option value="manual" ${l.seqMode==='manual'?'selected':''}>Manual — you send each email yourself</option>
+        <option value="paused" ${l.seqMode==='paused'?'selected':''}>Paused — skip this lead in all runs</option>
+      </select>
+    </div>
+    ${(l.replies||alreadyReplied) ? `<div style="background:rgba(232,184,76,.04);border:1px solid rgba(232,184,76,.15);border-radius:8px;padding:11px;margin-bottom:12px">
+      <div class="cfg-lbl" style="margin-bottom:4px">Replies</div>
+      <div style="font-size:13px;color:var(--gold);font-weight:500">${l.replies ? l.replies+' reply/replies logged' : '💬 Replied (status)'}</div>
+    </div>` : ''}
+    ${l.notes ? `<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px">
+      <div class="cfg-lbl" style="margin-bottom:4px">Notes</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">${l.notes}</div>
+    </div>` : ''}
+  `);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+function saveConn() {
+  SCRIPT_URL = document.getElementById('cfg-url').value.trim();
+  PW         = document.getElementById('cfg-pw').value.trim();
+  localStorage.setItem('pa_url', SCRIPT_URL);
+  localStorage.setItem('pa_pw', PW);
+  document.getElementById('url-in').value = SCRIPT_URL;
+  document.getElementById('pw-in').value  = PW;
+  toast('Saved — click Load Data to connect','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+const pgMeta = {
+  overview:     ['Overview','Dark Seduction: Fundamentals Course'],
+  hotleads:     ['Hot Leads','3+ logins — reach out personally now'],
+  allleads:     ['All Leads','Full lead database — sortable & searchable'],
+  logins:       ['Login Feed','Every login event timestamped'],
+  sequence:     ['Sequence Tracker','Per-lead email status & controls'],
+  editor:       ['Email Editor','Edit subjects, bodies & Email 5 pricing live'],
+  tracking:     ['Open & Click Data','Email opens, CTA clicks, tracking summary'],
+  stats:        ['Stats & A/B Results','Per-email performance, funnel & subject line tests'],
+  reengagement: ['Re-engagement','Cold lead nudges & hot lead fast-track log'],
+  purchases:    ['Purchases','Revenue tracking & conversion log'],
+  failures:     ['Failed Emails','Send failures — bounce & delivery errors'],
+  dailylog:     ['Daily Send Log','Audit log of every sequence run'],
+  settings:     ['Configuration','Script connection & trigger management'],
+};
+function nav(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')?.includes("'"+id+"'")) n.classList.add('active'); });
+  const m = pgMeta[id]||[id,''];
+  document.getElementById('pg-title').textContent = m[0];
+  document.getElementById('pg-sub').textContent   = m[1];
+  if (id==='editor' && !emailData.length && SCRIPT_URL) loadEmails();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════════════════
+function showModal(title, sub, btns=[], body='') {
+  document.getElementById('mo-title').textContent = title;
+  document.getElementById('mo-sub').textContent   = sub;
+  document.getElementById('mo-body').innerHTML    = body;
+  document.getElementById('mo-acts').innerHTML    = btns.map(b=>`<button class="${b.cls}" id="mbtn-${b.label.replace(/\s/g,'')}">${b.label}</button>`).join('');
+  btns.forEach(b=>{ const el=document.getElementById('mbtn-'+b.label.replace(/\s/g,'')); if(el) el.onclick=b.action; });
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function moClose(e)  { if (e.target===document.getElementById('modal')) closeModal(); }
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATUS DOT
+// ═══════════════════════════════════════════════════════════════════
+function setConn(state, msg) {
+  const dot = document.getElementById('cdot');
+  dot.className = 'conn-dot' + (state==='live'?' live':state==='err'?' err':'');
+  document.getElementById('cstat').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════════
+let _tt;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  clearTimeout(_tt); _tt = setTimeout(()=>el.className='', 3400);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PURCHASES PAGE
+// ═══════════════════════════════════════════════════════════════════
+function renderPurchases() {
+  // Filter to email-sourced purchases only
+  // A purchase counts as email-origin if source==='email' OR source is blank/undefined (legacy — assume email since all purchases were via email sequence)
+  const emailPurchases = purchases.filter(p => !p.source || p.source === 'email');
+
+  const total   = emailPurchases.length;
+  const revenue = emailPurchases.reduce((s,p)=>s+(+p.amount||0),0);
+  const aov     = total > 0 ? Math.round(revenue / total) : null;
+  const funnelConv = statsData.funnel?.conversionRate;
+
+  document.getElementById('ps-total').textContent   = total || '—';
+  document.getElementById('ps-revenue').textContent = total ? '₹'+revenue.toLocaleString() : '—';
+  document.getElementById('ps-aov').textContent     = aov != null ? '₹'+aov.toLocaleString() : '—';
+  document.getElementById('ps-conv').textContent    = funnelConv != null ? funnelConv+'%' : '—';
+
+  const tbody = document.getElementById('purch-tbody');
+  if (!emailPurchases.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">No email purchases logged yet — purchases with source <strong style="color:var(--gold)">"email"</strong> will appear here</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = emailPurchases.map(p=>`<tr>
+    <td style="font-size:10.5px;color:var(--dim)">${p.purchasedAt||'—'}</td>
+    <td style="font-weight:500">${p.name||'—'}</td>
+    <td style="font-size:10.5px;color:var(--dim)">${p.email||'—'}</td>
+    <td style="font-size:10.5px;color:var(--dim)">${p.enrolledDate||'—'}</td>
+    <td style="text-align:center;font-family:'Barlow',sans-serif;font-weight:700;color:var(--muted)">${p.loginsBeforePurchase||0}</td>
+    <td style="text-align:center;color:var(--dim)">E${p.lastEmailReceived||'?'}</td>
+    <td style="font-family:'Barlow',sans-serif;font-weight:700;color:var(--high)">₹${Number(p.amount||0).toLocaleString()}</td>
+    <td style="font-size:10.5px;color:var(--dim)">${p.notes||'—'}</td>
+  </tr>`).join('');
+}
+
+function showMarkPurchaseModal() { showMarkPurchaseModalForEmail(''); }
+
+function showMarkPurchaseModalForEmail(prefillEmail) {
+  closeModal();
+  showModal('Log Purchase', 'Mark a lead as converted and record the revenue.', [
+    {label:'Cancel', cls:'btn ghost', action:closeModal},
+    {label:'Log Purchase', cls:'btn pri', action:async()=>{
+      const email  = document.getElementById('mp-email').value.trim();
+      const amount = document.getElementById('mp-amount').value.trim();
+      const source = document.getElementById('mp-source').value.trim() || 'email';
+      if (!email) { toast('Email required','err'); return; }
+      closeModal();
+      await markPurchased(email, amount, source);
+    }}
+  ], `
+    <div class="cfg-row">
+      <div class="cfg-lbl">Lead Email</div>
+      <input class="cfg-in" id="mp-email" placeholder="lead@example.com" value="${prefillEmail}" style="width:100%">
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl">Amount (₹) — leave blank for default price</div>
+      <input class="cfg-in" id="mp-amount" placeholder="999" style="width:100%">
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl">Source</div>
+      <select class="cfg-in" id="mp-source" style="width:100%">
+        <option value="email" selected>email</option>
+        <option value="direct">direct</option>
+        <option value="other">other</option>
+      </select>
+      <div style="font-size:10.5px;color:var(--dim);margin-top:4px">Only <strong style="color:var(--gold)">email</strong> purchases appear on the Revenue page.</div>
+    </div>
+  `);
+}
+
+async function markPurchased(email, amount, source='email') {
+  if (!SCRIPT_URL) {
+    // Demo mode: update local state
+    const l = leads.find(x=>x.email===email);
+    if (l) l.status = '💰 Purchased';
+    purchases.push({purchasedAt:new Date().toLocaleString(),email,name:l?.name||email,enrolledDate:l?.enrolled||'—',loginsBeforePurchase:l?.logins||0,lastEmailReceived:5,amount:+amount||999,source,notes:''});
+    toast('Purchase logged (demo mode)','ok');
+    renderAll(); return;
+  }
+  try {
+    const r = await api('mark_purchased', `&email=${encodeURIComponent(email)}&amount=${encodeURIComponent(amount||'')}&source=${encodeURIComponent(source||'email')}`);
+    toast(r.message||'Purchase logged','ok');
+    setTimeout(loadData, 1000);
+  } catch(e) { toast('Failed to log purchase','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MARK REPLIED
+// ═══════════════════════════════════════════════════════════════════
+async function markReplied(email) {
+  if (!SCRIPT_URL) {
+    const l = leads.find(x=>x.email===email);
+    if (l) l.status = '💬 Replied';
+    toast('Marked as replied (demo mode)','ok');
+    renderAll(); return;
+  }
+  try {
+    const r = await api('mark_replied', `&email=${encodeURIComponent(email)}`);
+    toast(r.message||'Reply logged','ok');
+    setTimeout(loadData, 1000);
+  } catch(e) { toast('Failed','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FAILED EMAILS PAGE
+// ═══════════════════════════════════════════════════════════════════
+function renderFailures() {
+  const unresolved = failures.filter(f=>!f.resolved).length;
+  const countEl = document.getElementById('fail-unresolved-count');
+  if (countEl) countEl.textContent = unresolved > 0 ? unresolved + ' unresolved' : 'All resolved ✓';
+
+  const tbody = document.getElementById('fail-tbody');
+  if (!tbody) return;
+  if (!failures.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">No send failures recorded 🎉</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = failures.map((f,i)=>`<tr style="${f.resolved?'opacity:.5':''}">
+    <td style="font-size:10px;color:var(--dim)">${f.ts||'—'}</td>
+    <td style="font-weight:500">${f.name||'—'}</td>
+    <td style="font-size:10.5px;color:var(--dim)">${f.email||'—'}</td>
+    <td style="text-align:center;color:var(--muted)">E${f.emailNum||'?'}</td>
+    <td style="font-size:10.5px;color:var(--hot);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.error||''}">${f.error||'—'}</td>
+    <td style="text-align:center;color:var(--dim)">${f.retries||1}</td>
+    <td>${f.resolved
+      ? '<span class="tag" style="background:rgba(126,221,110,.1);color:var(--high);border:1px solid rgba(126,221,110,.2)">✓ Resolved</span>'
+      : '<span class="tag" style="background:rgba(255,107,107,.1);color:var(--hot);border:1px solid rgba(255,107,107,.2)">Unresolved</span>'}</td>
+    <td>${f.resolved ? '' : `<button class="btn sm" onclick="resolveFailure('${f.email}','${f.emailNum}',${i})">Resolve</button>`}</td>
+  </tr>`).join('');
+}
+
+async function resolveFailure(email, emailNum, idx) {
+  if (!SCRIPT_URL) {
+    failures[idx].resolved = true;
+    toast('Marked resolved (demo)','ok');
+    renderFailures(); updateBadges(); return;
+  }
+  try {
+    const r = await api('mark_failure_resolved', `&email=${encodeURIComponent(email)}&num=${encodeURIComponent(emailNum)}`);
+    toast(r.message||'Resolved','ok');
+    setTimeout(loadData, 800);
+  } catch(e) { toast('Failed','err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATS & A/B PAGE
+// ═══════════════════════════════════════════════════════════════════
+function renderStatsPage() {
+  const funnel = statsData.funnel || {};
+  const emailStats = statsData.emailStats || [];
+  const abStats = statsData.abStats || {};
+
+  // Funnel stats
+  const fnTotal = document.getElementById('fn-total');
+  const fnComp  = document.getElementById('fn-completed');
+  const fnPurch = document.getElementById('fn-purchased');
+  const fnUnsub = document.getElementById('fn-unsubs');
+  const fnRate  = document.getElementById('fn-completion-rate');
+  const fnConv  = document.getElementById('fn-conv-rate');
+  if (fnTotal) fnTotal.textContent = funnel.totalLeads ?? leads.length ?? '—';
+  if (fnComp)  fnComp.textContent  = funnel.completedAll ?? '—';
+  if (fnPurch) fnPurch.textContent = funnel.purchased ?? purchases.length ?? '—';
+  if (fnUnsub) fnUnsub.textContent = funnel.unsubscribed ?? '—';
+  if (fnRate)  fnRate.textContent  = funnel.completionRate != null ? funnel.completionRate+'% completion' : '';
+  if (fnConv)  fnConv.textContent  = funnel.conversionRate != null ? funnel.conversionRate+'% of E5 recipients' : '';
+
+  // Funnel bar
+  const fbarEl = document.getElementById('funnel-bar');
+  if (fbarEl && funnel.totalLeads) {
+    const total = funnel.totalLeads;
+    const steps = [
+      {label:'E1',val:funnel.reachedEmail1,clr:'var(--ret)'},
+      {label:'E2',val:funnel.reachedEmail2,clr:'var(--ret)'},
+      {label:'E3',val:funnel.reachedEmail3,clr:'var(--gold)'},
+      {label:'E4',val:funnel.reachedEmail4,clr:'var(--gold)'},
+      {label:'E5',val:funnel.reachedEmail5,clr:'var(--accent)'},
+      {label:'Bought',val:funnel.purchased,clr:'var(--high)'},
+    ];
+    fbarEl.innerHTML = `<div style="display:flex;gap:10px;align-items:flex-end;height:70px;padding:4px 0">` +
+      steps.map(s=>{
+        const pct = total > 0 ? Math.round((s.val||0)/total*100) : 0;
+        const h = Math.max(6, pct * 0.65);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;color:${s.clr}">${s.val??0}</div>
+          <div style="width:100%;height:${h}px;background:${s.clr};border-radius:3px 3px 0 0;opacity:.85;transition:height .4s"></div>
+          <div style="font-family:'Barlow',sans-serif;font-size:8px;color:var(--dim);text-align:center">${s.label}<br>${pct}%</div>
+        </div>`;
+      }).join('') + `</div>`;
+  }
+
+  // Per-email table
+  const tbody = document.getElementById('per-email-tbody');
+  if (tbody) {
+    if (!emailStats.length) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--dim);padding:28px">No stats data yet — send some emails first</td></tr>`;
+    } else {
+      tbody.innerHTML = emailStats.map(e=>{
+        const orCls = e.openRate>=60?'color:var(--high);font-weight:700':e.openRate>=40?'color:var(--gold)':'color:var(--dim)';
+        const crCls = e.ctaRate>=30?'color:var(--high);font-weight:700':e.ctaRate>=10?'color:var(--gold)':'color:var(--dim)';
+        return `<tr>
+          <td style="font-family:'Barlow',sans-serif;font-weight:700;color:var(--dim)">E${e.emailNum}</td>
+          <td style="font-weight:500">${e.label||'—'}</td>
+          <td style="text-align:center;color:var(--muted)">${e.sent||0}</td>
+          <td style="text-align:center;color:var(--ret)">${e.opened||0}</td>
+          <td style="text-align:center;${orCls}">${e.openRate!=null?e.openRate+'%':'—'}</td>
+          <td style="text-align:center;color:var(--high)">${e.ctaClicked||0}</td>
+          <td style="text-align:center;${crCls}">${e.ctaRate!=null?e.ctaRate+'%':'—'}</td>
+          <td style="text-align:center;color:var(--dim)">${e.avgMinsToOpen!=null?e.avgMinsToOpen+'m':'—'}</td>
+          <td style="text-align:right;font-family:'Barlow',sans-serif;font-weight:700;color:var(--gold)">${e.revenueAfterThisEmail?'₹'+Number(e.revenueAfterThisEmail).toLocaleString():'—'}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // A/B Stats
+  const abEl = document.getElementById('ab-stats-body');
+  if (abEl) {
+    const keys = Object.keys(abStats);
+    if (!keys.length) {
+      abEl.innerHTML = `<div class="empty"><div class="empty-ic">◌</div><div class="empty-tx">No A/B data yet — set Subject B in Email Editor to start testing</div></div>`;
+    } else {
+      // Group by email number
+      const byEmail = {};
+      keys.forEach(k=>{
+        const m = k.match(/email(\d+)_([AB])/);
+        if (!m) return;
+        const n=m[1], v=m[2];
+        if (!byEmail[n]) byEmail[n]=[null,null];
+        byEmail[n][v==='A'?0:1] = abStats[k];
+      });
+      abEl.innerHTML = Object.entries(byEmail).sort((a,b)=>+a[0]-+b[0]).map(([n,[A,B]])=>{
+        const winner = (A&&B) ? (A.openRate>B.openRate?'A':B.openRate>A.openRate?'B':'tie') : '—';
+        const winCls = winner==='A'?'color:var(--ret)':winner==='B'?'color:var(--high)':'color:var(--dim)';
+        return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--plat-dim)">Email ${n}</div>
+            <div style="font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;${winCls}">Winner: ${winner}</div>
+          </div>
+          <div class="g2">
+            <div style="padding:9px;background:var(--card);border:1px solid ${winner==='A'?'rgba(110,171,221,.3)':'var(--border)'};border-radius:8px">
+              <div style="font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;color:var(--ret);margin-bottom:6px">VARIANT A (Default)</div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:11.5px;color:var(--dim)">Sent: <strong style="color:var(--text)">${A?.sent??0}</strong></span>
+                <span style="font-size:11.5px;color:var(--dim)">Opened: <strong style="color:var(--text)">${A?.opened??0}</strong></span>
+                <span style="font-size:13px;font-weight:700;color:var(--ret)">${A?.openRate??0}%</span>
+              </div>
+            </div>
+            <div style="padding:9px;background:var(--card);border:1px solid ${winner==='B'?'rgba(126,221,110,.3)':'var(--border)'};border-radius:8px">
+              <div style="font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;color:var(--high);margin-bottom:6px">VARIANT B (Challenger)</div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:11.5px;color:var(--dim)">Sent: <strong style="color:var(--text)">${B?.sent??0}</strong></span>
+                <span style="font-size:11.5px;color:var(--dim)">Opened: <strong style="color:var(--text)">${B?.opened??0}</strong></span>
+                <span style="font-size:13px;font-weight:700;color:var(--high)">${B?.openRate??0}%</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RE-ENGAGEMENT PAGE
+// ═══════════════════════════════════════════════════════════════════
+function renderReengagement() {
+  // Cold leads = in sequence, Email 1 not opened (use tracking data)
+  const openedE1 = new Set(tracking.filter(t=>+t.emailNum===1&&t.opened).map(t=>(t.email||'').toLowerCase()));
+  const coldLeads = sequence.filter(s=>s.e1&&!openedE1.has((s.email||'').toLowerCase())&&s.complete!==true);
+
+  const reTotal  = document.getElementById('re-total');
+  const reCold   = document.getElementById('re-cold');
+  const reFast   = document.getElementById('re-fasttrack');
+  if (reTotal) reTotal.textContent = coldLeads.length || '0';
+  if (reCold)  reCold.textContent  = coldLeads.length || '—';
+
+  // Fast-tracked: sequence rows where some email shows (fast-tracked) marker — we detect via e5 sent but e2/e3/e4 not fully sent
+  const fastTracked = sequence.filter(s=>s.e5&&(!s.e2||!s.e3||!s.e4));
+  if (reFast) reFast.textContent = fastTracked.length || '0';
+
+  // Re-engagement tbody — this data would come from a separate get_reengagement endpoint
+  // For now show cold leads as candidates, and fast-tracked leads
+  const tbody = document.getElementById('reeng-tbody');
+  if (tbody) {
+    if (!coldLeads.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--high);padding:28px">✓ No cold leads — all Email 1 recipients opened it</td></tr>`;
+    } else {
+      tbody.innerHTML = coldLeads.map(s=>`<tr>
+        <td style="font-size:10.5px;color:var(--dim)">${s.email}</td>
+        <td style="font-weight:500">${s.name}</td>
+        <td style="font-size:10.5px;color:var(--dim)">${s.signupDate||'—'}</td>
+        <td style="text-align:center;color:var(--hot);font-family:'Barlow',sans-serif;font-weight:700">Never opened</td>
+        <td><span class="tag" style="background:rgba(255,107,107,.08);color:var(--hot);border:1px solid rgba(255,107,107,.2)">Awaiting nudge or already nudged</span></td>
+      </tr>`).join('');
+    }
+  }
+
+  // Fast-track list
+  const ftList = document.getElementById('fasttrack-list');
+  if (ftList) {
+    if (!fastTracked.length) {
+      ftList.innerHTML = `<div style="font-size:11.5px;color:var(--dim)">No fast-tracked leads yet. This triggers automatically when a lead logs in for the 3rd time.</div>`;
+    } else {
+      ftList.innerHTML = fastTracked.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(24,37,64,.38)">
+        <div style="font-size:12px;font-weight:500;color:var(--high)">⚡</div>
+        <div style="flex:1">
+          <div style="font-size:12.5px;font-weight:500">${s.name}</div>
+          <div style="font-size:10.5px;color:var(--dim)">${s.email}</div>
+        </div>
+        <span class="tag t-high">E5 Fast-Tracked</span>
+      </div>`).join('');
+    }
+  }
+}
+
+function renderDailyLog() {
+  const tbody = document.getElementById('dailylog-tbody');
+  if (!tbody) return;
+
+  // Summary stats
+  const totalRuns   = dailyLog.length;
+  const totalSent   = dailyLog.reduce((s,r)=>s+(+r.emailsSent||0),0);
+  const totalFails  = dailyLog.reduce((s,r)=>s+(+r.failures||0),0);
+  const dlRunsEl = document.getElementById('dl-runs');
+  const dlSentEl = document.getElementById('dl-sent');
+  const dlFailEl = document.getElementById('dl-fails');
+  if (dlRunsEl) dlRunsEl.textContent = totalRuns||'—';
+  if (dlSentEl) dlSentEl.textContent = totalSent||'—';
+  if (dlFailEl) dlFailEl.textContent = totalFails||'—';
+
+  if (!dailyLog.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:28px">No runs logged yet — trigger hasn't fired</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = dailyLog.map(r=>{
+    const hasFailures = (+r.failures||0) > 0;
+    const isManual    = (r.triggeredBy||'').includes('dashboard');
+    const isQuota     = (r.triggeredBy||'').includes('QUOTA');
+    return `<tr style="${isQuota?'background:rgba(42,8,8,.4)':''}">
+      <td style="font-family:'Barlow',sans-serif;font-size:10.5px;font-weight:600">${r.date||'—'}</td>
+      <td style="font-size:10.5px;color:var(--dim)">${r.time||'—'}</td>
+      <td style="text-align:center;font-family:'Barlow',sans-serif;font-weight:700;color:${isQuota?'var(--hot)':'var(--high)'}">${r.emailsSent||0}</td>
+      <td style="text-align:center;color:var(--dim)">${r.leadsProcessed||0}</td>
+      <td style="text-align:center;${hasFailures||isQuota?'color:var(--hot);font-weight:700':'color:var(--dim)'}">${r.failures||0}</td>
+      <td>${isQuota
+        ? '<span class="tag" style="background:rgba(255,107,107,.1);color:var(--hot);border:1px solid rgba(255,107,107,.2);font-size:7.5px">⛔ Quota Abort</span>'
+        : `<span class="tag ${isManual?'t-manual':'t-auto'}" style="font-size:7.5px">${r.triggeredBy||'auto'}</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
