@@ -501,12 +501,29 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
                 </div>
               </div>
             </div>
+            <!-- Test Email panel -->
+            <div class="panel">
+              <div class="ph"><div class="pt">🧪 Send Test Email to Yourself</div></div>
+              <div class="pb">
+                <div style="font-size:11.5px;color:var(--dim);line-height:1.7;margin-bottom:12px">
+                  Preview any email exactly as your leads will receive it — sent to <strong style="color:var(--gold)">persuasionacademybyra@gmail.com</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <button class="btn" onclick="sendTestEmail(1)">✉ Test Email 1 — The Mirror</button>
+                  <button class="btn" onclick="sendTestEmail(2)">✉ Test Email 2 — The Offer</button>
+                  <button class="btn" style="border-color:rgba(201,149,58,.4);color:var(--gold)" onclick="sendTestEmail(5)">⚡ Test Fast-Track Email</button>
+                </div>
+              </div>
+            </div>
+          </div>
             <!-- Quick send -->
             <div class="panel">
               <div class="ph"><div class="pt">Quick Send — All Pending</div></div>
               <div class="pb">
                 <div class="g2">
-                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 2 — OFFER</div><div class="qc-subj">You have seen the problem. Here is the only real solution.</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(1)"><div class="qc-num">Email 1 · Day 0 — THE MIRROR</div><div class="qc-subj">Something I want to say before you start.</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 2 — THE OFFER</div><div class="qc-subj">What changes. And when.</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" style="border-color:rgba(201,149,58,.3)" onclick="confirmSend(5)"><div class="qc-num" style="color:var(--gold)">⚡ Fast-Track — HOT LEAD OFFER</div><div class="qc-subj">You have been back three times now.</div><div class="qc-sub">Send to all pending hot leads</div></div>
                 </div>
               </div>
             </div>
@@ -520,6 +537,7 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
                   <th>Name</th><th>Email</th><th>Enrolled</th>
                   <th style="text-align:center">E1 · Day 0</th>
                   <th style="text-align:center">E2 · Day 2</th>
+                  <th style="text-align:center">⚡ Fast-Track</th>
                   <th style="text-align:center">Done</th>
                   <th>Mode</th>
                   <th>Actions</th>
@@ -1094,14 +1112,16 @@ function renderSequence() {
 
   if (!data.length) { document.getElementById('seq-tbody').innerHTML=`<tr><td colspan="11" style="text-align:center;color:var(--dim);padding:28px">No data</td></tr>`; return; }
   document.getElementById('seq-tbody').innerHTML = data.map(s=>{
-    const emails = [s.e1,s.e2,s.e3,s.e4,s.e5];
+    const emails = [s.e1, s.e2, s.e5]; // E1, E2, Fast-Track only
+    const labels = ['E1','E2','⚡'];
     const pendingIdx = emails.findIndex(e=>!e);
     const dots = emails.map((sent,i)=>{
       const cls = sent?'ed-sent':i===pendingIdx?'ed-pending':'ed-none';
-      const label = sent?'✓':(i===pendingIdx?'…':(i+1));
+      const label = sent?'✓':(i===pendingIdx?'…':labels[i]);
       return `<td style="text-align:center"><div class="email-dot ${cls}" title="${sent?'Sent':'Pending'}">${label}</div></td>`;
     }).join('');
     const modeTag = `<span class="tag ${s.mode==='auto'?'t-auto':s.mode==='paused'?'t-paused':'t-manual'}">${s.mode||'auto'}</span>`;
+    const allSent = s.e1 && s.e2 && s.e5;
     return `<tr>
       <td><strong style="font-weight:500">${s.name}</strong></td>
       <td style="font-size:10.5px;color:var(--dim)">${s.email}</td>
@@ -1116,19 +1136,19 @@ function renderSequence() {
         </select>
       </td>
       <td style="display:flex;gap:5px;flex-wrap:wrap;padding:9px 10px">
-        ${!s.e2?`<button class="btn sm" onclick="sendToLead(2,'${s.email}')">Send E2</button>`:''}
-        ${!s.e3?`<button class="btn sm" onclick="sendToLead(3,'${s.email}')">Send E3</button>`:''}
-        ${!s.e4?`<button class="btn sm" onclick="sendToLead(4,'${s.email}')">Send E4</button>`:''}
-        ${!s.e5?`<button class="btn sm" onclick="sendToLead(5,'${s.email}')">Send E5</button>`:''}
-        ${(s.e1&&s.e2&&s.e3&&s.e4&&s.e5)?'<span style="font-size:10.5px;color:var(--dim)">All sent</span>':''}
+        ${!s.e1?`<button class="btn sm" onclick="sendToLead(1,'${s.email}')">Send E1</button>`:''}
+        ${s.e1&&!s.e2?`<button class="btn sm" onclick="sendToLead(2,'${s.email}')">Send E2</button>`:''}
+        ${s.e1&&!s.e5?`<button class="btn sm" style="border-color:rgba(201,149,58,.4);color:var(--gold)" onclick="sendToLead(5,'${s.email}')">⚡ Fast-Track</button>`:''}
+        ${allSent?'<span style="font-size:10.5px;color:var(--dim)">All sent</span>':''}
       </td>
     </tr>`;
   }).join('');
 }
 
 function seqRow(s) {
-  const emails = [s.e1,s.e2,s.e3,s.e4,s.e5];
-  const dots = emails.map((sent,i)=>`<div class="email-dot ${sent?'ed-sent':''}" style="width:22px;height:22px;font-size:7.5px">${sent?'✓':i+1}</div>`).join('');
+  const emails = [s.e1, s.e2, s.e5];
+  const labels = ['E1','E2','⚡'];
+  const dots = emails.map((sent,i)=>`<div class="email-dot ${sent?'ed-sent':''}" style="width:22px;height:22px;font-size:7.5px">${sent?'✓':labels[i]}</div>`).join('');
   return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(24,37,64,.38)">
     <div style="font-size:12px;font-weight:500;width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</div>
     <div style="display:flex;gap:4px">${dots}</div>
@@ -1264,8 +1284,7 @@ function renderEmailPanels() {
   const ftBody = (ft.body && ft.body !== '(default — edit to customise)') ? ft.body : '';
   const ftPanel = `<div class="ep" id="ep-ft">
     <div class="info-box" style="margin-bottom:14px">
-      <strong style="color:var(--gold)">⚡ Fast-Track Email</strong> — fires automatically when a lead logs in for the <strong>3rd time</strong>. Not part of the day sequence. These leads are your hottest — they keep coming back. This email uses the same price &amp; URL settings as Email 2 (shared <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">email2_*</code> Script Properties).<br><br>
-      <strong style="color:var(--hot)">⚠ Backend fix required in Code.gs</strong> — <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">sendSequenceEmail()</code> fetches the subject from <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">getEmailSequence()[4]</code> which is now <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">undefined</code> (Email 5 was removed from the sequence). The fast-track is currently sending with <strong>no subject line</strong>. Fix: in <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">hotLeadFastTrack()</code>, replace <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">sendSequenceEmail(name, email, 4)</code> with a direct <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">MailApp.sendEmail()</code> call using <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">props.getProperty('email5_subject')</code> as the subject.
+      <strong style="color:var(--gold)">⚡ Fast-Track Email</strong> — fires automatically when a lead logs in for the <strong>3rd time</strong>. Not part of the day sequence. These leads are your hottest — they keep coming back. This email uses the same price &amp; URL settings as Email 2 (shared <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">email2_*</code> Script Properties).
     </div>
     <div class="e5-extras">
       <div class="e5-title">Price &amp; CTA Settings (shared with Email 2)</div>
@@ -1378,6 +1397,25 @@ function confirmSend(num) {
     {label:'Cancel', cls:'btn ghost', action:()=>closeModal()},
     {label:'Send Now', cls:'btn pri', action:async()=>{ closeModal(); await sendEmailToAll(num); }}
   ]);
+}
+
+async function sendTestEmail(num) {
+  if (!SCRIPT_URL) { toast('Connect Apps Script URL first','err'); return; }
+  const testEmail = 'persuasionacademybyra@gmail.com';
+  showModal(
+    'Send Test Email ' + (num===5?'(Fast-Track)':num),
+    'This will send a real email to ' + testEmail + ' — exactly as your leads receive it.',
+    [
+      {label:'Cancel', cls:'btn ghost', action:()=>closeModal()},
+      {label:'Send Test Now', cls:'btn pri', action:async()=>{
+        closeModal();
+        try {
+          const r = await api('send_email', `&num=${num}&email=${encodeURIComponent(testEmail)}&test=1`);
+          toast('Test email sent to ' + testEmail, 'ok');
+        } catch(e) { toast('Send failed','err'); }
+      }}
+    ]
+  );
 }
 
 async function sendEmailToAll(num) {
