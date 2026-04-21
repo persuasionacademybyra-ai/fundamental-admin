@@ -496,7 +496,8 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
                 <div style="font-size:11.5px;color:var(--dim);line-height:1.7">
                   <strong style="color:var(--muted)">Auto</strong> — trigger fires daily, sends to all auto-mode leads.<br>
                   <strong style="color:var(--muted)">Manual</strong> — you control send timing per-lead or globally.<br>
-                  You can override per-lead using the Seq Mode column in All Leads.
+                  Sequence: <strong style="color:var(--gold)">Email 1 on Day 0</strong> (signup) → <strong style="color:var(--gold)">Email 2 on Day 2</strong> (offer close).<br>
+                  Hot leads (3 logins) receive the fast-track offer immediately.
                 </div>
               </div>
             </div>
@@ -505,10 +506,7 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
               <div class="ph"><div class="pt">Quick Send — All Pending</div></div>
               <div class="pb">
                 <div class="g2">
-                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 1</div><div class="qc-subj">Nobody is going to tell you this</div><div class="qc-sub">Send to all pending</div></div>
-                  <div class="qcard" onclick="confirmSend(3)"><div class="qc-num">Email 3 · Day 2</div><div class="qc-subj">13 years. Here is what I found</div><div class="qc-sub">Send to all pending</div></div>
-                  <div class="qcard" onclick="confirmSend(4)"><div class="qc-num">Email 4 · Day 3</div><div class="qc-subj">Rolex does not chase you</div><div class="qc-sub">Send to all pending</div></div>
-                  <div class="qcard" onclick="confirmSend(5)"><div class="qc-num">Email 5 · Day 4 — OFFER</div><div class="qc-subj">This is what changes next</div><div class="qc-sub">Send to all pending</div></div>
+                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 2 — OFFER</div><div class="qc-subj">You have seen the problem. Here is the only real solution.</div><div class="qc-sub">Send to all pending</div></div>
                 </div>
               </div>
             </div>
@@ -520,16 +518,13 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
               <table class="seq-grid">
                 <thead><tr>
                   <th>Name</th><th>Email</th><th>Enrolled</th>
-                  <th style="text-align:center">E1</th>
-                  <th style="text-align:center">E2</th>
-                  <th style="text-align:center">E3</th>
-                  <th style="text-align:center">E4</th>
-                  <th style="text-align:center">E5</th>
+                  <th style="text-align:center">E1 · Day 0</th>
+                  <th style="text-align:center">E2 · Day 2</th>
                   <th style="text-align:center">Done</th>
                   <th>Mode</th>
                   <th>Actions</th>
                 </tr></thead>
-                <tbody id="seq-tbody"><tr><td colspan="11" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
+                <tbody id="seq-tbody"><tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -547,11 +542,9 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
             Changes saved here update your <strong>Script Properties</strong> — the actual email text your leads receive. Use <strong>{{firstName}}</strong> anywhere in the body and it will be replaced with the lead's first name. Email 5 has extra fields for price and CTA links.
           </div>
           <div class="email-tabs" id="email-tabs">
-            <button class="etab active" onclick="switchEmail(1)">Email 1 · Day 0</button>
-            <button class="etab" onclick="switchEmail(2)">Email 2 · Day 1</button>
-            <button class="etab" onclick="switchEmail(3)">Email 3 · Day 2</button>
-            <button class="etab" onclick="switchEmail(4)">Email 4 · Day 3</button>
-            <button class="etab" onclick="switchEmail(5)">Email 5 · Day 4 — Offer</button>
+            <button class="etab active" onclick="switchEmail(1)">Email 1 · Day 0 — The Mirror</button>
+            <button class="etab" onclick="switchEmail(2)">Email 2 · Day 2 — The Offer</button>
+            <button class="etab" onclick="switchEmail('ft')">⚡ Fast-Track — Hot Lead (3rd Login)</button>
           </div>
           <div id="email-panels">
             <!-- injected by renderEmailPanels() -->
@@ -568,8 +561,8 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
           </div>
           <div class="info-box">
             <strong>Open tracking</strong> works via a 1×1 pixel in the HTML email — fires when the email client loads images. Gmail prompts users before loading images, so ~40–60% open rate is realistic.<br>
-            <strong>CTA click tracking</strong> (Email 5 only) — all links route through your Apps Script redirect before landing on your sales page. Every click is logged.<br>
-            <strong>UTM parameters</strong> are auto-appended to all Email 5 links: <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">utm_source=email_sequence&utm_medium=email&utm_campaign=dsm_email_5</code> — visible in Google Analytics.<br>
+            <strong>CTA click tracking</strong> (Email 2 only) — all links route through your Apps Script redirect before landing on your sales page. Every click is logged.<br>
+            <strong>UTM parameters</strong> are auto-appended to all Email 2 links: <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">utm_source=email_sequence&utm_medium=email&utm_campaign=dsm_email_2</code> — visible in Google Analytics.<br>
             <strong>Time-on-email</strong> is not technically trackable in standard email — only web pages can measure it. The open count proxy is the best available signal.
           </div>
           <div class="panel" style="margin-bottom:16px">
@@ -579,11 +572,11 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
             </div>
           </div>
           <div class="panel">
-            <div class="ph"><div class="pt">Email 5 — CTA Summary</div></div>
+            <div class="ph"><div class="pt">Email 2 — CTA Summary (Offer Close)</div></div>
             <div class="pb">
               <div class="stats-grid" style="margin-bottom:0">
-                <div class="stat"><div class="stat-ey">E5 Sent</div><div class="stat-n" id="trk-e5-sent" style="color:var(--plat)">—</div><div class="stat-sub">Leads received offer</div></div>
-                <div class="stat"><div class="stat-ey">E5 Opened</div><div class="stat-n" style="color:var(--ret)" id="trk-e5-open">—</div><div class="stat-sub">Unique open events</div></div>
+                <div class="stat"><div class="stat-ey">E2 Sent</div><div class="stat-n" id="trk-e5-sent" style="color:var(--plat)">—</div><div class="stat-sub">Leads received offer</div></div>
+                <div class="stat"><div class="stat-ey">E2 Opened</div><div class="stat-n" style="color:var(--ret)" id="trk-e5-open">—</div><div class="stat-sub">Unique open events</div></div>
                 <div class="stat"><div class="stat-ey">CTA Clicks</div><div class="stat-n c-high" id="trk-e5-click">—</div><div class="stat-sub">Clicked offer link</div></div>
                 <div class="stat"><div class="stat-ey">Click Rate</div><div class="stat-n c-gold" id="trk-e5-rate">—</div><div class="stat-sub">Clicks / sent</div></div>
               </div>
@@ -620,8 +613,8 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
             <div class="tbl-wrap">
               <table>
                 <thead><tr>
-                  <th>#</th><th>Label</th><th>Sent</th><th>Opened</th><th>Open Rate</th>
-                  <th>CTA Clicks</th><th>Click Rate</th><th>Avg Min to Open</th><th>Revenue After (₹)</th>
+                  <th>#</th><th>Label</th><th>Day</th><th>Sent</th><th>Opened</th><th>Open Rate</th>
+                  <th>CTA Clicks</th><th>Click Rate</th><th>Revenue After (₹)</th>
                 </tr></thead>
                 <tbody id="per-email-tbody"><tr><td colspan="9" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
               </table>
@@ -1242,22 +1235,13 @@ const defaultSubjects = [
 
 function renderEmailPanels() {
   const panels = document.getElementById('email-panels');
-  panels.innerHTML = [1,2,3,4,5].map(n=>{
+
+  // Build panels for Email 1 and Email 2
+  const seqPanels = [1,2].map(n=>{
     const d = emailData[n-1] || {};
     const subj = d.subject || defaultSubjects[n-1];
     const body = (d.body && d.body !== '(default — edit to customise)') ? d.body : '';
-    const e5 = n===5 ? `
-      <div class="e5-extras">
-        <div class="e5-title">Email 5 — Price & CTA Settings</div>
-        <div class="e5-grid">
-          <div class="field-grp"><div class="field-lbl">Current Price</div><input class="field-in" id="e5-price" value="${d.price||'999'}" placeholder="999"></div>
-          <div class="field-grp"><div class="field-lbl">Next Price (urgency)</div><input class="field-in" id="e5-price-next" value="${d.priceNext||'1999'}" placeholder="1999"></div>
-          <div class="field-grp"><div class="field-lbl">Get Access URL (tracked)</div><input class="field-in" id="e5-cta" value="${d.ctaUrl||'persuasionacademybyra.com'}" placeholder="persuasionacademybyra.com"></div>
-          <div class="field-grp"><div class="field-lbl">Info Page URL (tracked)</div><input class="field-in" id="e5-info" value="${d.infoUrl||'dsm.persuasionacademybyra.com'}" placeholder="dsm.persuasionacademybyra.com"></div>
-        </div>
-      </div>` : '';
     return `<div class="ep${n===1?' active':''}" id="ep-${n}">
-      ${e5}
       <div class="field-grp"><div class="field-lbl">Subject Line — Variant A (default)</div><input class="field-in" id="e${n}-subj" value="${subj.replace(/"/g,'&quot;')}" placeholder="Email ${n} subject..."></div>
       <div class="field-grp">
         <div class="field-lbl" style="display:flex;align-items:center;gap:8px">Subject Line — Variant B <span style="font-family:'Barlow',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(201,149,58,.1);color:var(--gold);border:1px solid rgba(201,149,58,.2)">A/B Test</span></div>
@@ -1274,12 +1258,49 @@ function renderEmailPanels() {
       </div>
     </div>`;
   }).join('');
+
+  // Fast-Track panel (uses email2_* price/url properties same as the backend)
+  const ft = emailData[4] || {}; // index 4 = email5 slot in backend
+  const ftBody = (ft.body && ft.body !== '(default — edit to customise)') ? ft.body : '';
+  const ftPanel = `<div class="ep" id="ep-ft">
+    <div class="info-box" style="margin-bottom:14px">
+      <strong style="color:var(--gold)">⚡ Fast-Track Email</strong> — fires automatically when a lead logs in for the <strong>3rd time</strong>. Not part of the day sequence. These leads are your hottest — they keep coming back. This email uses the same price &amp; URL settings as Email 2 (shared <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">email2_*</code> Script Properties).<br><br>
+      <strong style="color:var(--hot)">⚠ Backend fix required in Code.gs</strong> — <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">sendSequenceEmail()</code> fetches the subject from <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">getEmailSequence()[4]</code> which is now <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">undefined</code> (Email 5 was removed from the sequence). The fast-track is currently sending with <strong>no subject line</strong>. Fix: in <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">hotLeadFastTrack()</code>, replace <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">sendSequenceEmail(name, email, 4)</code> with a direct <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">MailApp.sendEmail()</code> call using <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--hot)">props.getProperty('email5_subject')</code> as the subject.
+    </div>
+    <div class="e5-extras">
+      <div class="e5-title">Price &amp; CTA Settings (shared with Email 2)</div>
+      <div class="e5-grid">
+        <div class="field-grp"><div class="field-lbl">Current Price</div><input class="field-in" id="eft-price" value="${ft.price||'999'}" placeholder="999"></div>
+        <div class="field-grp"><div class="field-lbl">Next Price (urgency)</div><input class="field-in" id="eft-price-next" value="${ft.priceNext||'1999'}" placeholder="1999"></div>
+        <div class="field-grp"><div class="field-lbl">Get Access URL</div><input class="field-in" id="eft-cta" value="${ft.ctaUrl||'persuasionacademybyra.com'}" placeholder="persuasionacademybyra.com"></div>
+        <div class="field-grp"><div class="field-lbl">Info Page URL</div><input class="field-in" id="eft-info" value="${ft.infoUrl||'dsm.persuasionacademybyra.com'}" placeholder="dsm.persuasionacademybyra.com"></div>
+      </div>
+    </div>
+    <div class="field-grp"><div class="field-lbl">Subject Line</div><input class="field-in" id="eft-subj" value="${(ft.subject||'You have been back three times. This one is for you.').replace(/"/g,'&quot;')}" placeholder="Fast-track subject..."></div>
+    <div class="field-grp">
+      <div class="field-lbl">Email Body — use {{firstName}} for personalisation</div>
+      <textarea class="field-in" id="eft-body" placeholder="Paste or type the fast-track email body here.\n\nLeave blank to use the default body from Code.gs.">${ftBody}</textarea>
+    </div>
+    <div style="display:flex;gap:9px;align-items:center">
+      <button class="btn pri" onclick="saveFastTrack()">Save Fast-Track Email</button>
+      <span style="font-size:11px;color:var(--dim)">Updates email2_* Script Properties — live immediately</span>
+    </div>
+  </div>`;
+
+  panels.innerHTML = seqPanels + ftPanel;
 }
 
 function switchEmail(n) {
   document.querySelectorAll('.ep').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.etab').forEach((t,i)=>t.classList.toggle('active',i===n-1));
-  document.getElementById('ep-'+n).classList.add('active');
+  // Tab indices: 0=Email1, 1=Email2, 2=FastTrack
+  const tabs = document.querySelectorAll('.etab');
+  if (n === 'ft') {
+    tabs.forEach((t,i)=>t.classList.toggle('active', i===2));
+    document.getElementById('ep-ft').classList.add('active');
+  } else {
+    tabs.forEach((t,i)=>t.classList.toggle('active', i===n-1));
+    document.getElementById('ep-'+n).classList.add('active');
+  }
 }
 
 async function saveEmail(n) {
@@ -1289,15 +1310,29 @@ async function saveEmail(n) {
   const body   = document.getElementById('e'+n+'-body')?.value || '';
   let extra = `&num=${n}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
   if (subjB) extra += `&subject_b=${encodeURIComponent(subjB)}`;
-  if (n===5) {
-    extra += `&price=${encodeURIComponent(document.getElementById('e5-price')?.value||'')}`;
-    extra += `&price_next=${encodeURIComponent(document.getElementById('e5-price-next')?.value||'')}`;
-    extra += `&cta_url=${encodeURIComponent(document.getElementById('e5-cta')?.value||'')}`;
-    extra += `&info_url=${encodeURIComponent(document.getElementById('e5-info')?.value||'')}`;
-  }
   try {
     const res = await api('save_email', extra);
     toast(res.message || 'Saved!', res.status==='success'?'ok':'err');
+  } catch(e) { toast('Save failed','err'); }
+}
+
+async function saveFastTrack() {
+  if (!SCRIPT_URL) { toast('Connect your Apps Script URL first','err'); return; }
+  const subj      = document.getElementById('eft-subj')?.value || '';
+  const body      = document.getElementById('eft-body')?.value || '';
+  const price     = document.getElementById('eft-price')?.value || '';
+  const priceNext = document.getElementById('eft-price-next')?.value || '';
+  const ctaUrl    = document.getElementById('eft-cta')?.value || '';
+  const infoUrl   = document.getElementById('eft-info')?.value || '';
+  // Saves using num=5 which maps to email5_* AND email2_* price/url properties
+  let extra = `&num=5&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  extra += `&price=${encodeURIComponent(price)}`;
+  extra += `&price_next=${encodeURIComponent(priceNext)}`;
+  extra += `&cta_url=${encodeURIComponent(ctaUrl)}`;
+  extra += `&info_url=${encodeURIComponent(infoUrl)}`;
+  try {
+    const res = await api('save_email', extra);
+    toast(res.message || 'Fast-Track saved!', res.status==='success'?'ok':'err');
   } catch(e) { toast('Save failed','err'); }
 }
 
