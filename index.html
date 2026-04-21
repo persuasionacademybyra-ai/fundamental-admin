@@ -542,7 +542,7 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
                   <th>Mode</th>
                   <th>Actions</th>
                 </tr></thead>
-                <tbody id="seq-tbody"><tr><td colspan="8" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
+                <tbody id="seq-tbody"><tr><td colspan="9" style="text-align:center;color:var(--dim);padding:28px">Load data</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -1027,8 +1027,9 @@ function hlRow(l) {
   const isHot = +l.logins>=3, isDone = contacted.has(l.email);
   const isVeryHot = +l.logins>=6;
   const modeTag = `<span class="tag ${l.seqMode==='auto'?'t-auto':l.seqMode==='paused'?'t-paused':'t-manual'}">${l.seqMode||'auto'}</span>`;
+  // isVeryHot (6+) → red hl-row; hot but not very hot (3-5) → green hl-row high
   return `<div class="hl-row${isVeryHot?'':' high'}" onclick="openLeadModal('${l.email}')">
-    <div class="hl-av${isVeryHot?' ':' av-high'}">${init}</div>
+    <div class="hl-av${isVeryHot?'':' av-high'}">${init}</div>
     <div class="hl-info">
       <div class="hl-name">${l.name}</div>
       <div class="hl-email">${l.email}</div>
@@ -1260,12 +1261,13 @@ function renderEmailPanels() {
   const seqPanels = [1,2].map(n=>{
     const d = emailData[n-1] || {};
     const subj = d.subject || defaultSubjects[n-1];
+    const subjB = d.subjectB || '';
     const body = (d.body && d.body !== '(default — edit to customise)') ? d.body : '';
     return `<div class="ep${n===1?' active':''}" id="ep-${n}">
       <div class="field-grp"><div class="field-lbl">Subject Line — Variant A (default)</div><input class="field-in" id="e${n}-subj" value="${subj.replace(/"/g,'&quot;')}" placeholder="Email ${n} subject..."></div>
       <div class="field-grp">
         <div class="field-lbl" style="display:flex;align-items:center;gap:8px">Subject Line — Variant B <span style="font-family:'Barlow',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(201,149,58,.1);color:var(--gold);border:1px solid rgba(201,149,58,.2)">A/B Test</span></div>
-        <input class="field-in" id="e${n}-subj-b" value="${(d.subjectB||'').replace(/"/g,'&quot;')}" placeholder="Leave blank to disable A/B testing for this email...">
+        <input class="field-in" id="e${n}-subj-b" value="${subjB.replace(/"/g,'&quot;')}" placeholder="Leave blank to disable A/B testing for this email...">
         <div style="font-size:10.5px;color:var(--dim);margin-top:4px">50% of leads get variant B (deterministic hash split). View results in Stats &amp; A/B page.</div>
       </div>
       <div class="field-grp">
@@ -1411,8 +1413,12 @@ async function sendTestEmail(num) {
         closeModal();
         try {
           const r = await api('send_email', `&num=${num}&email=${encodeURIComponent(testEmail)}&test=1`);
-          toast('Test email sent to ' + testEmail, 'ok');
-        } catch(e) { toast('Send failed','err'); }
+          if (r && r.status === 'success') {
+            toast('Test email sent to ' + testEmail, 'ok');
+          } else {
+            toast((r && r.message) || 'Test send failed — check Apps Script logs', 'err');
+          }
+        } catch(e) { toast('Send failed — check URL and connection','err'); }
       }}
     ]
   );
