@@ -20,6 +20,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
+/* body overflow:hidden is intentional — scrolling handled by .scroll child */
 body{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")}
 body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;pointer-events:none;background:linear-gradient(90deg,transparent,var(--gold-dim) 15%,var(--gold-soft) 35%,var(--gold) 50%,var(--gold-soft) 65%,var(--gold-dim) 85%,transparent);background-size:200% auto;animation:shimBar 4s linear infinite}
 @keyframes shimBar{0%{background-position:200% center}100%{background-position:-200% center}}
@@ -69,7 +70,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── MAIN ── */
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .topbar{padding:13px 26px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .tb-left{}
 .tb-page{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;line-height:1}
@@ -93,12 +94,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9
 .btn:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
 
 /* ── SCROLL CONTENT ── */
-.scroll{flex:1;overflow-y:auto}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
 .content{padding:22px 26px;animation:fadeUp .35s var(--expo)}
 
 /* ── PAGE VISIBILITY ── */
 .page{display:none}
-.page.active{display:block}
+.page.active{display:block;min-height:100%}
 
 /* ── STAT CARDS ── */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
@@ -237,10 +238,10 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
 .toggle-track::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .22s}
 .toggle-switch input:checked+.toggle-track::before{transform:translateX(18px)}
 /* preview pane */
-.email-preview-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:sticky;top:0}
+.email-preview-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:sticky;top:22px;align-self:flex-start}
 .preview-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .preview-title{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
-.preview-frame-wrap{padding:16px;background:var(--card2);overflow-y:auto;max-height:calc(100vh - 280px)}
+.preview-frame-wrap{padding:16px;background:var(--card2);overflow-y:auto;max-height:calc(100vh - 200px)}
 iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;background:#e8e4d8}
 
 /* ── MODE TOGGLE ── */
@@ -909,14 +910,38 @@ window.onload = () => {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-//  API CALL
+//  API CALL — uses JSONP to bypass CORS on Apps Script /exec URLs
 // ═══════════════════════════════════════════════════════════════════
-async function api(action, extra='') {
-  if (!SCRIPT_URL) { toast('Enter your Apps Script URL first','err'); throw new Error('No URL'); }
-  const url = SCRIPT_URL + '?action=' + action + '&pw=' + encodeURIComponent(PW) + extra;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data;
+let _apiCounter = 0;
+function api(action, extra='') {
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL first','err'); return Promise.reject(new Error('No URL')); }
+  return new Promise((resolve, reject) => {
+    const cbName = '__pa_cb_' + (++_apiCounter);
+    const timer = setTimeout(() => {
+      delete window[cbName];
+      const s = document.getElementById('_pa_s_' + cbName);
+      if (s) s.remove();
+      reject(new Error('Request timed out (15s). Check your Apps Script URL and deployment settings.'));
+    }, 15000);
+    window[cbName] = function(data) {
+      clearTimeout(timer);
+      delete window[cbName];
+      const s = document.getElementById('_pa_s_' + cbName);
+      if (s) s.remove();
+      resolve(data);
+    };
+    const url = SCRIPT_URL + '?action=' + action + '&pw=' + encodeURIComponent(PW) + extra + '&callback=' + cbName;
+    const script = document.createElement('script');
+    script.id  = '_pa_s_' + cbName;
+    script.src = url;
+    script.onerror = () => {
+      clearTimeout(timer);
+      delete window[cbName];
+      script.remove();
+      reject(new Error('Could not reach Apps Script. Make sure it is deployed as Web App with access: Anyone.'));
+    };
+    document.head.appendChild(script);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1364,6 +1389,28 @@ function renderEmailPanels() {
   </div>`;
 
   panels.innerHTML = seqPanels + ftPanel + stylePanel();
+  // After rendering, activate the correct tab
+  switchEmail(1);
+}
+
+function switchEmail(tab) {
+  // Update tab buttons
+  document.querySelectorAll('.etab').forEach((btn, i) => {
+    const tabs = [1, 2, 'ft', 'style'];
+    btn.classList.toggle('active', tabs[i] === tab);
+  });
+  // Hide all panels
+  document.querySelectorAll('.ep').forEach(p => p.classList.remove('active'));
+  // Show target panel
+  const target = tab === 'style' ? 'ep-style' : tab === 'ft' ? 'ep-ft' : 'ep-' + tab;
+  const el = document.getElementById(target);
+  if (el) {
+    el.classList.add('active');
+    // Trigger preview render when switching to style tab
+    if (tab === 'style') {
+      setTimeout(() => updateStylePreview(), 50);
+    }
+  }
 }
 
 // ── STYLE EDITOR ─────────────────────────────────────────────────────────────
@@ -1395,10 +1442,29 @@ function loadStylePrefs() {
   catch(e) { return getStyleDefaults(); }
 }
 
-function saveStylePrefs() {
+async function saveStylePrefs() {
   const s = readStyleForm();
   localStorage.setItem('pa_email_style', JSON.stringify(s));
-  toast('Style saved locally — copy the Code.gs snippet below to apply to sent emails','ok');
+
+  if (SCRIPT_URL) {
+    // Build extra params with style_ prefix so Apps Script handleSaveStyle can read them
+    let extra = '';
+    Object.keys(s).forEach(k => {
+      extra += '&style_' + encodeURIComponent(k) + '=' + encodeURIComponent(String(s[k]));
+    });
+    try {
+      const res = await api('save_style', extra);
+      if (res.status === 'success') {
+        toast('✓ Style saved to Apps Script — next email uses new design', 'ok');
+      } else {
+        toast('Saved locally — could not reach Apps Script: ' + (res.message || ''), 'err');
+      }
+    } catch(e) {
+      toast('Saved locally — Apps Script unreachable', 'err');
+    }
+  } else {
+    toast('Style saved locally — connect Script URL to push to Apps Script', 'ok');
+  }
   updateStylePreview();
 }
 
@@ -1546,7 +1612,7 @@ function stylePanel() {
     </div>
     <div class="style-editor">
       <!-- LEFT: Controls -->
-      <div class="style-col" style="overflow-y:auto;max-height:calc(100vh - 280px);padding-right:6px">
+      <div class="style-col" style="padding-right:6px">
 
         <div class="style-section">
           <div class="style-section-title">◈ Background & Card</div>
@@ -1608,10 +1674,13 @@ function stylePanel() {
           ${colorRow('Chapter Bar Left Border','st-chapborder','st-chapborder-sw',s.chapterBarBorder)}
         </div>
 
-        <div style="display:flex;gap:9px;margin-top:4px;margin-bottom:20px">
+        <div style="display:flex;gap:9px;margin-top:4px;margin-bottom:12px">
           <button class="btn pri" style="flex:1" onclick="saveStylePrefs()">💾 Save Style</button>
           <button class="btn" onclick="copyStyleSnippet()">Copy Code.gs Snippet</button>
           <button class="btn ghost" onclick="resetStyle()">↺ Reset</button>
+        </div>
+        <div style="background:rgba(201,149,58,.04);border:1px dashed rgba(201,149,58,.2);border-radius:8px;padding:10px 13px;font-size:11.5px;color:var(--dim);line-height:1.6;margin-bottom:20px">
+          <strong style="color:var(--muted)">How saving works:</strong> "Save Style" stores your preferences in this browser (localStorage) and updates the live preview. To apply your style to <em>actual emails sent to leads</em>, click <strong style="color:var(--gold)">Copy Code.gs Snippet</strong> and paste it into your Apps Script <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">sendSequenceEmail()</code> function.
         </div>
       </div>
 
@@ -1943,7 +2012,10 @@ function nav(id) {
   const m = pgMeta[id]||[id,''];
   document.getElementById('pg-title').textContent = m[0];
   document.getElementById('pg-sub').textContent   = m[1];
-  if (id==='editor' && !emailData.length && SCRIPT_URL) loadEmails();
+  if (id==='editor') {
+    renderEmailPanels();
+    if (SCRIPT_URL && !emailData.length) loadEmails();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
