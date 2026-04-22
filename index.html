@@ -49,11 +49,24 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9
 .nav-bd{margin-left:auto;font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px}
 .nb-hot{background:rgba(255,107,107,.12);color:var(--hot);border:1px solid rgba(255,107,107,.2)}
 .nb-gold{background:rgba(201,149,58,.1);color:var(--gold);border:1px solid rgba(201,149,58,.22)}
-.sb-foot{padding:12px 20px;border-top:1px solid var(--border)}
-.sb-conn{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--dim)}
+.sb-foot{padding:12px 14px 14px;border-top:1px solid var(--border)}
+.sb-conn{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--dim);margin-bottom:10px}
 .conn-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
 .conn-dot.live{background:var(--high);box-shadow:0 0 5px rgba(126,221,110,.5);animation:pulse 2s infinite}
 .conn-dot.err{background:var(--hot)}
+.sync-panel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px}
+.sync-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.sync-label{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:5px}
+.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--dim);flex-shrink:0;transition:background .3s}
+.sync-dot.active{background:var(--high);box-shadow:0 0 4px rgba(126,221,110,.5);animation:pulse 2s infinite}
+.sync-dot.syncing{background:var(--gold);animation:pulse .6s infinite}
+.sync-countdown{font-family:'Barlow',sans-serif;font-size:9.5px;font-weight:600;color:var(--dim);margin-bottom:7px;min-height:13px}
+.sync-countdown span{color:var(--gold)}
+.sync-btn{width:100%;font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px;border-radius:6px;border:1px solid rgba(201,149,58,.25);background:rgba(201,149,58,.06);color:var(--gold);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.sync-btn:hover{background:rgba(201,149,58,.14);border-color:var(--accent)}
+.sync-btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.sync-spinner{display:inline-block;width:8px;height:8px;border:1.5px solid rgba(201,149,58,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── MAIN ── */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -198,6 +211,37 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
 .e5-extras{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
 .e5-title{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:12px}
 .e5-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── VISUAL STYLE EDITOR ── */
+.style-editor{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.style-col{}
+.style-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.style-section-title{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.style-row{margin-bottom:13px}
+.style-lbl{font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.style-lbl span{color:var(--muted);font-weight:400;letter-spacing:0;font-size:10px;text-transform:none}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-swatch{width:32px;height:32px;border-radius:7px;border:2px solid var(--border-light);cursor:pointer;flex-shrink:0;transition:border .18s}
+.color-swatch:hover{border-color:var(--accent)}
+.color-hex{width:90px;background:var(--card2);border:1px solid var(--border-light);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;transition:border .18s}
+.color-hex:focus{outline:none;border-color:var(--accent)}
+.style-slider{width:100%;accent-color:var(--accent);height:4px;cursor:pointer}
+.style-select{width:100%;background:var(--card2);border:1px solid var(--border-light);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;padding:7px 10px;transition:border .18s;cursor:pointer}
+.style-select:focus{outline:none;border-color:var(--accent)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--card2);border:1px solid var(--border-light);border-radius:8px}
+.toggle-lbl{font-size:12.5px;color:var(--muted)}
+.toggle-switch{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--border-light);border-radius:20px;cursor:pointer;transition:background .22s}
+.toggle-switch input:checked+.toggle-track{background:var(--accent)}
+.toggle-track::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .22s}
+.toggle-switch input:checked+.toggle-track::before{transform:translateX(18px)}
+/* preview pane */
+.email-preview-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:sticky;top:0}
+.preview-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.preview-title{font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.preview-frame-wrap{padding:16px;background:var(--card2);overflow-y:auto;max-height:calc(100vh - 280px)}
+iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;background:#e8e4d8}
 
 /* ── MODE TOGGLE ── */
 .mode-toggle{display:flex;gap:6px;margin-bottom:14px}
@@ -367,6 +411,15 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
     </nav>
     <div class="sb-foot">
       <div class="sb-conn"><span class="conn-dot" id="cdot"></span><span id="cstat">Not connected</span></div>
+      <div class="sync-panel">
+        <div class="sync-top">
+          <div class="sync-label"><span class="sync-dot active" id="sync-dot"></span>Live Sync</div>
+        </div>
+        <div class="sync-countdown" id="sync-countdown">Auto sync every <span>4 hours</span></div>
+        <button class="sync-btn" id="sync-now-btn" onclick="manualSync()">
+          <span id="sync-btn-ic">↻</span> Sync Now
+        </button>
+      </div>
     </div>
   </div>
 
@@ -563,6 +616,7 @@ textarea.field-in{min-height:180px;line-height:1.7;font-size:13px}
             <button class="etab active" onclick="switchEmail(1)">Email 1 · Day 0 — The Mirror</button>
             <button class="etab" onclick="switchEmail(2)">Email 2 · Day 2 — The Offer</button>
             <button class="etab" onclick="switchEmail('ft')">⚡ Fast-Track — Hot Lead (3rd Login)</button>
+            <button class="etab" onclick="switchEmail('style')" style="border-color:rgba(110,171,221,.3);color:var(--ret)">🎨 Visual Style Editor</button>
           </div>
           <div id="email-panels">
             <!-- injected by renderEmailPanels() -->
@@ -851,6 +905,7 @@ window.onload = () => {
   setGlobalMode(globalMode, false);
   loadDemoData();
   renderEmailPanels();
+  initSync();
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1308,20 +1363,346 @@ function renderEmailPanels() {
     </div>
   </div>`;
 
-  panels.innerHTML = seqPanels + ftPanel;
+  panels.innerHTML = seqPanels + ftPanel + stylePanel();
 }
 
-function switchEmail(n) {
-  document.querySelectorAll('.ep').forEach(p=>p.classList.remove('active'));
-  // Tab indices: 0=Email1, 1=Email2, 2=FastTrack
-  const tabs = document.querySelectorAll('.etab');
-  if (n === 'ft') {
-    tabs.forEach((t,i)=>t.classList.toggle('active', i===2));
-    document.getElementById('ep-ft').classList.add('active');
-  } else {
-    tabs.forEach((t,i)=>t.classList.toggle('active', i===n-1));
-    document.getElementById('ep-'+n).classList.add('active');
-  }
+// ── STYLE EDITOR ─────────────────────────────────────────────────────────────
+function getStyleDefaults() {
+  return {
+    bgColor:         '#e8e4d8',
+    cardColor:       '#F2EFE4',
+    borderColor:     '#c8c4b0',
+    headerBrand:     '#8C6A1A',
+    goldLine:        '#C9A84C',
+    goldLineThick:   '2',
+    bodyFont:        'Source Serif 4',
+    bodyColor:       '#2a2210',
+    bodySize:        '17',
+    greetingSize:    '20',
+    greetingColor:   '#1a1208',
+    greetingBold:    true,
+    signoffColor:    '#8C6A1A',
+    credColor:       '#7a6a52',
+    goldLinePos:     'bottom',  // 'top-only', 'both', 'bottom'
+    showChapterBar:  true,
+    chapterBarBg:    '#fdf8ec',
+    chapterBarBorder:'#C9A84C',
+  };
+}
+
+function loadStylePrefs() {
+  try { return Object.assign(getStyleDefaults(), JSON.parse(localStorage.getItem('pa_email_style')||'{}')); }
+  catch(e) { return getStyleDefaults(); }
+}
+
+function saveStylePrefs() {
+  const s = readStyleForm();
+  localStorage.setItem('pa_email_style', JSON.stringify(s));
+  toast('Style saved locally — copy the Code.gs snippet below to apply to sent emails','ok');
+  updateStylePreview();
+}
+
+function readStyleForm() {
+  const g = id => document.getElementById(id);
+  const d = getStyleDefaults();
+  return {
+    bgColor:          g('st-bg')?.value         || d.bgColor,
+    cardColor:        g('st-card')?.value       || d.cardColor,
+    borderColor:      g('st-border')?.value     || d.borderColor,
+    headerBrand:      g('st-brand')?.value      || d.headerBrand,
+    goldLine:         g('st-gold')?.value       || d.goldLine,
+    goldLineThick:    g('st-goldthick')?.value  || d.goldLineThick,
+    bodyFont:         g('st-font')?.value       || d.bodyFont,
+    bodyColor:        g('st-bodycolor')?.value  || d.bodyColor,
+    bodySize:         g('st-bodysize')?.value   || d.bodySize,
+    greetingSize:     g('st-greetsize')?.value  || d.greetingSize,
+    greetingColor:    g('st-greetcolor')?.value || d.greetingColor,
+    greetingBold:     g('st-greetbold')?.checked ?? d.greetingBold,
+    signoffColor:     g('st-signoff')?.value    || d.signoffColor,
+    credColor:        g('st-cred')?.value       || d.credColor,
+    goldLinePos:      g('st-linepos')?.value    || d.goldLinePos,
+    showChapterBar:   g('st-chapter')?.checked  ?? d.showChapterBar,
+    chapterBarBg:     g('st-chapbg')?.value     || d.chapterBarBg,
+    chapterBarBorder: g('st-chapborder')?.value || d.chapterBarBorder,
+  };
+}
+
+function updateColorHex(swatchId, hexId) {
+  const swatch = document.getElementById(swatchId);
+  const hex    = document.getElementById(hexId);
+  if (!swatch || !hex) return;
+  hex.value = swatch.value;
+  updateStylePreview();
+}
+
+function updateColorSwatch(hexId, swatchId) {
+  const hex    = document.getElementById(hexId);
+  const swatch = document.getElementById(swatchId);
+  if (!hex || !swatch) return;
+  if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) swatch.value = hex.value;
+  updateStylePreview();
+}
+
+function updateStylePreview() {
+  const s   = readStyleForm();
+  const iframe = document.getElementById('style-preview');
+  if (!iframe) return;
+  const fontStack = s.bodyFont === 'Georgia' ? "Georgia,serif" :
+                    s.bodyFont === 'Trebuchet MS' ? "'Trebuchet MS',sans-serif" :
+                    s.bodyFont === 'Times New Roman' ? "'Times New Roman',serif" :
+                    `'${s.bodyFont}',Georgia,serif`;
+  const gfLink = ['Source Serif 4','Playfair Display','Lora','Merriweather'].includes(s.bodyFont)
+    ? `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(s.bodyFont)}:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">` : '';
+
+  const topLine  = (s.goldLinePos==='top-only'||s.goldLinePos==='both')
+    ? `<tr><td style="height:${s.goldLineThick}px;background:${s.goldLine};font-size:0;line-height:0;">&nbsp;</td></tr>` : '';
+  const bottomLine = (s.goldLinePos==='bottom'||s.goldLinePos==='both')
+    ? `<tr><td style="padding:0 40px 24px;"><div style="height:${s.goldLineThick}px;background:${s.goldLine};"></div></td></tr>` : '';
+  const chapterEx = s.showChapterBar
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px;"><tr>
+        <td style="border-left:3px solid ${s.chapterBarBorder};padding:10px 16px;background:${s.chapterBarBg};">
+          <span style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${s.headerBrand};">■ &nbsp; CHAPTER 01 — THE FOUNDATION</span>
+        </td></tr></table>` : '';
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+  ${gfLink}
+  </head>
+  <body style="margin:0;padding:0;background:${s.bgColor};font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${s.bgColor};padding:24px 12px;">
+  <tr><td align="center">
+  <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:${s.cardColor};border:1px solid ${s.borderColor};">
+    <!-- HEADER -->
+    <tr><td style="background:${s.cardColor};border-bottom:1px solid ${s.borderColor};padding:18px 36px;">
+      <table width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;color:${s.headerBrand};">PERSUASION ACADEMY BY RA</td>
+        <td align="right" style="font-family:Barlow,sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${s.borderColor};">THE MIRROR</td>
+      </tr></table>
+    </td></tr>
+    ${topLine}
+    <!-- BODY -->
+    <tr><td style="padding:32px 36px 24px;background:${s.cardColor};">
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;"><tr>
+        <td width="28" style="vertical-align:middle;"><div style="width:28px;height:2px;background:${s.headerBrand};"></div></td>
+        <td style="padding-left:10px;vertical-align:middle;font-family:Barlow,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${s.headerBrand};">DARK SEDUCTION · FUNDAMENTALS COURSE</td>
+      </tr></table>
+      <div style="font-family:${fontStack};font-size:${s.bodySize}px;color:${s.bodyColor};line-height:1.82;">
+        <span style="font-family:${fontStack};font-size:${s.greetingSize}px;font-weight:${s.greetingBold?'600':'400'};color:${s.greetingColor};">Hey {{firstName}},</span><br><br>
+        Before you open Chapter 01, I want to tell you something.<br><br>
+        You will probably read the first few pages and think: this is about me. Not in a general way. In a specific, uncomfortable, how-does-he-know-that way.<br><br>
+        ${chapterEx}
+        There will be things named in there that you have never heard named out loud. Experiences you have carried quietly for a long time.<br><br>
+        They will make sense after this.<br><br>
+        <br>
+        <span style="font-family:Barlow,sans-serif;font-size:14px;font-weight:700;letter-spacing:.07em;color:${s.signoffColor};">RA</span><br>
+        <span style="font-family:Barlow,sans-serif;font-size:11px;color:${s.credColor};letter-spacing:.03em;">Dating and Relationship Expert | Human Nature and Dark Attraction Patterns | Making dating easier for men</span>
+      </div>
+    </td></tr>
+    ${bottomLine}
+    <!-- UNSUB -->
+    <tr><td style="background:${s.cardColor};border-top:1px solid ${s.borderColor};padding:14px 36px 18px;">
+      <div style="font-family:Barlow,sans-serif;font-size:10px;color:${s.credColor};line-height:1.7;">
+        You received this because you enrolled in the Fundamentals Course. &nbsp;·&nbsp; <a href="#" style="color:${s.headerBrand};text-decoration:underline;">Unsubscribe</a>
+      </div>
+    </td></tr>
+  </table>
+  </td></tr></table>
+  </body></html>`;
+
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+}
+
+function stylePanel() {
+  const s = loadStylePrefs();
+  const colorRow = (label, id, swatchId, val) =>
+    '<div class="style-row">' +
+      '<div class="style-lbl">' + label + '</div>' +
+      '<div class="color-row">' +
+        '<input type="color" class="color-swatch" id="' + swatchId + '" value="' + val + '" oninput="updateColorHex(\'' + swatchId + '\',\'' + id + '\')">' +
+        '<input type="text" class="color-hex" id="' + id + '" value="' + val + '" placeholder="#000000" oninput="updateColorSwatch(\'' + id + '\',\'' + swatchId + '\')">' +
+        '<div style="flex:1;height:28px;border-radius:6px;border:1px solid var(--border-light);background:' + val + '" id="' + id + '-preview"></div>' +
+      '</div>' +
+    '</div>';
+  const sliderRow = (label, id, min, max, val, unit) => {
+    unit = unit || 'px';
+    return '<div class="style-row">' +
+      '<div class="style-lbl">' + label + ' <span id="' + id + '-val">' + val + unit + '</span></div>' +
+      '<input type="range" class="style-slider" id="' + id + '" min="' + min + '" max="' + max + '" value="' + val + '" oninput="document.getElementById(\'' + id + '-val\').textContent=this.value+\'' + unit + '\';updateStylePreview()">' +
+    '</div>';
+  };
+  const toggleRow = (label, id, checked) =>
+    '<div class="toggle-row style-row">' +
+      '<span class="toggle-lbl">' + label + '</span>' +
+      '<label class="toggle-switch">' +
+        '<input type="checkbox" id="' + id + '" ' + (checked ? 'checked' : '') + ' onchange="updateStylePreview()">' +
+        '<div class="toggle-track"></div>' +
+      '</label>' +
+    '</div>';
+
+  return `<div class="ep" id="ep-style">
+    <div class="info-box" style="margin-bottom:16px">
+      <strong style="color:var(--gold)">🎨 Visual Style Editor</strong> — Customize exactly how your emails look. Changes show instantly in the preview. When you're happy, click <strong>Save Style</strong> and then copy the generated snippet into your <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">Code.gs</code> to apply to all sent emails.
+    </div>
+    <div class="style-editor">
+      <!-- LEFT: Controls -->
+      <div class="style-col" style="overflow-y:auto;max-height:calc(100vh - 280px);padding-right:6px">
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Background & Card</div>
+          ${colorRow('Outer Background','st-bg','st-bg-sw',s.bgColor)}
+          ${colorRow('Email Card Color','st-card','st-card-sw',s.cardColor)}
+          ${colorRow('Border / Divider Color','st-border','st-border-sw',s.borderColor)}
+        </div>
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Brand & Accent</div>
+          ${colorRow('Brand Color (header, chapter bar)','st-brand','st-brand-sw',s.headerBrand)}
+          ${colorRow('Gold Accent Line Color','st-gold','st-gold-sw',s.goldLine)}
+          ${sliderRow('Gold Line Thickness','st-goldthick',1,8,s.goldLineThick)}
+          <div class="style-row">
+            <div class="style-lbl">Gold Line Position</div>
+            <select class="style-select" id="st-linepos" onchange="updateStylePreview()">
+              <option value="top-only"  ${s.goldLinePos==='top-only'?'selected':''}>Top only (below header)</option>
+              <option value="bottom"    ${s.goldLinePos==='bottom'?'selected':''}>Bottom only (above unsub)</option>
+              <option value="both"      ${s.goldLinePos==='both'?'selected':''}>Both top & bottom</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Body Text</div>
+          <div class="style-row">
+            <div class="style-lbl">Body Font</div>
+            <select class="style-select" id="st-font" onchange="updateStylePreview()">
+              <option value="Source Serif 4"  ${s.bodyFont==='Source Serif 4'?'selected':''}>Source Serif 4 (default)</option>
+              <option value="Georgia"         ${s.bodyFont==='Georgia'?'selected':''}>Georgia</option>
+              <option value="Lora"            ${s.bodyFont==='Lora'?'selected':''}>Lora</option>
+              <option value="Merriweather"    ${s.bodyFont==='Merriweather'?'selected':''}>Merriweather</option>
+              <option value="Playfair Display"${s.bodyFont==='Playfair Display'?'selected':''}>Playfair Display</option>
+              <option value="Times New Roman" ${s.bodyFont==='Times New Roman'?'selected':''}>Times New Roman</option>
+              <option value="Trebuchet MS"    ${s.bodyFont==='Trebuchet MS'?'selected':''}>Trebuchet MS (sans)</option>
+            </select>
+          </div>
+          ${colorRow('Body Text Color','st-bodycolor','st-bodycolor-sw',s.bodyColor)}
+          ${sliderRow('Body Font Size','st-bodysize',13,22,s.bodySize)}
+        </div>
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Greeting Line (Hey {{firstName}},)</div>
+          ${sliderRow('Greeting Font Size','st-greetsize',14,30,s.greetingSize)}
+          ${colorRow('Greeting Color','st-greetcolor','st-greetcolor-sw',s.greetingColor)}
+          ${toggleRow('Bold Greeting','st-greetbold',s.greetingBold)}
+        </div>
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Sign-off & Credentials</div>
+          ${colorRow('"RA" Sign-off Color','st-signoff','st-signoff-sw',s.signoffColor)}
+          ${colorRow('Credentials / Tagline Color','st-cred','st-cred-sw',s.credColor)}
+        </div>
+
+        <div class="style-section">
+          <div class="style-section-title">◈ Chapter Bar (##CHAPTER## blocks)</div>
+          ${toggleRow('Show Chapter Bar','st-chapter',s.showChapterBar)}
+          ${colorRow('Chapter Bar Background','st-chapbg','st-chapbg-sw',s.chapterBarBg)}
+          ${colorRow('Chapter Bar Left Border','st-chapborder','st-chapborder-sw',s.chapterBarBorder)}
+        </div>
+
+        <div style="display:flex;gap:9px;margin-top:4px;margin-bottom:20px">
+          <button class="btn pri" style="flex:1" onclick="saveStylePrefs()">💾 Save Style</button>
+          <button class="btn" onclick="copyStyleSnippet()">Copy Code.gs Snippet</button>
+          <button class="btn ghost" onclick="resetStyle()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Preview -->
+      <div>
+        <div class="email-preview-wrap">
+          <div class="preview-header">
+            <div class="preview-title">Live Preview — exactly how it will look</div>
+            <div style="font-family:'Barlow',sans-serif;font-size:8.5px;color:var(--dim)">Updates as you change settings</div>
+          </div>
+          <div class="preview-frame-wrap">
+            <iframe id="style-preview" scrolling="no" onload="resizePreview(this)"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Code Snippet -->
+    <div class="panel" style="margin-top:16px" id="snippet-panel" style="display:none">
+      <div class="ph"><div class="pt">📋 Code.gs Snippet — Paste into sendSequenceEmail()</div><button class="btn sm" onclick="copySnippetText()">Copy</button></div>
+      <div class="pb">
+        <pre id="snippet-text" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;color:var(--gold);overflow-x:auto;white-space:pre-wrap;line-height:1.7;font-family:'DM Sans',monospace"></pre>
+        <div style="margin-top:10px;font-size:11.5px;color:var(--dim);line-height:1.7">Replace the relevant variable declarations in the <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">sendSequenceEmail</code> function with these values. Your changes will apply to all emails sent from that point on.</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function resizePreview(iframe) {
+  try {
+    const h = iframe.contentWindow.document.body.scrollHeight;
+    iframe.style.height = Math.max(h, 400) + 'px';
+  } catch(e) {}
+}
+
+function resetStyle() {
+  localStorage.removeItem('pa_email_style');
+  renderEmailPanels();
+  switchEmail('style');
+  toast('Style reset to defaults','ok');
+}
+
+function generateSnippet(s) {
+  return `// ── PASTE INTO sendSequenceEmail() in Code.gs ──────────────────────────
+// Replace the matching lines in your htmlBody array with these values.
+// Generated by Email Style Editor — ${new Date().toLocaleDateString()}
+
+// Background & card
+const EMAIL_BG        = '${s.bgColor}';
+const EMAIL_CARD      = '${s.cardColor}';
+const EMAIL_BORDER    = '${s.borderColor}';
+
+// Brand & accent
+const EMAIL_BRAND     = '${s.headerBrand}';    // header text, chapter bar
+const EMAIL_GOLD      = '${s.goldLine}';      // gold line color
+const EMAIL_GOLD_H    = '${s.goldLineThick}px'; // gold line thickness
+const EMAIL_LINE_POS  = '${s.goldLinePos}';   // top-only | bottom | both
+
+// Body text
+const EMAIL_FONT      = "'${s.bodyFont}',Georgia,serif";
+const EMAIL_BODY_CLR  = '${s.bodyColor}';
+const EMAIL_BODY_SZ   = '${s.bodySize}px';
+
+// Greeting
+const EMAIL_GREET_SZ  = '${s.greetingSize}px';
+const EMAIL_GREET_CLR = '${s.greetingColor}';
+const EMAIL_GREET_WT  = '${s.greetingBold?600:400}';
+
+// Sign-off & credentials
+const EMAIL_SIGNOFF   = '${s.signoffColor}';   // RA color
+const EMAIL_CRED      = '${s.credColor}';      // tagline color
+
+// Chapter bar
+const EMAIL_CHAP_SHOW = ${s.showChapterBar};
+const EMAIL_CHAP_BG   = '${s.chapterBarBg}';
+const EMAIL_CHAP_BRD  = '${s.chapterBarBorder}';`;
+}
+
+function copyStyleSnippet() {
+  const s = readStyleForm();
+  const snippet = generateSnippet(s);
+  const panel = document.getElementById('snippet-panel');
+  const pre   = document.getElementById('snippet-text');
+  if (panel) panel.style.display = '';
+  if (pre)   pre.textContent = snippet;
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function copySnippetText() {
+  const txt = document.getElementById('snippet-text')?.textContent || '';
+  navigator.clipboard.writeText(txt).then(()=>toast('Snippet copied to clipboard!','ok')).catch(()=>toast('Copy failed — select and copy manually','err'));
 }
 
 async function saveEmail(n) {
@@ -1586,6 +1967,94 @@ function setConn(state, msg) {
   const dot = document.getElementById('cdot');
   dot.className = 'conn-dot' + (state==='live'?' live':state==='err'?' err':'');
   document.getElementById('cstat').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LIVE SYNC — Auto every 5 min + manual
+// ═══════════════════════════════════════════════════════════════════
+const AUTO_SYNC_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours in ms
+let autoSyncTimer = null;
+let isSyncing     = false;
+let lastSyncTime  = null;
+
+function initSync() {
+  scheduleAutoSync();
+  updateSyncUI();
+  // Reschedule when tab becomes visible again
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // If 4 hours have passed while tab was hidden, sync immediately
+      if (lastSyncTime && (Date.now() - lastSyncTime) >= AUTO_SYNC_INTERVAL) {
+        doAutoSync();
+      }
+      updateSyncUI();
+    }
+  });
+}
+
+function scheduleAutoSync() {
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = setTimeout(() => {
+    doAutoSync();
+  }, AUTO_SYNC_INTERVAL);
+}
+
+async function doAutoSync() {
+  if (!SCRIPT_URL || isSyncing) { scheduleAutoSync(); return; }
+  isSyncing = true;
+  setSyncingState(true);
+  await loadData();
+  isSyncing    = false;
+  lastSyncTime = Date.now();
+  setSyncingState(false);
+  updateSyncUI();
+  scheduleAutoSync();
+}
+
+async function manualSync() {
+  if (isSyncing) return;
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL first', 'err'); return; }
+  // Reset auto timer so it fires 4h from now, not from the old schedule
+  clearTimeout(autoSyncTimer);
+  isSyncing = true;
+  setSyncingState(true);
+  await loadData();
+  isSyncing    = false;
+  lastSyncTime = Date.now();
+  setSyncingState(false);
+  updateSyncUI();
+  scheduleAutoSync();
+}
+
+function updateSyncUI() {
+  const countEl = document.getElementById('sync-countdown');
+  const dotEl   = document.getElementById('sync-dot');
+  if (lastSyncTime) {
+    const ago = Math.floor((Date.now() - lastSyncTime) / 1000);
+    const m   = Math.floor(ago / 60);
+    const s   = ago % 60;
+    const agoStr = m > 0 ? m + 'm ' + s + 's ago' : s + 's ago';
+    if (countEl) countEl.innerHTML = 'Last sync <span>' + agoStr + '</span> &middot; auto in 4h';
+  } else {
+    if (countEl) countEl.innerHTML = 'Auto sync every <span>4 hours</span>';
+  }
+  if (dotEl) dotEl.className = 'sync-dot active';
+}
+
+function setSyncingState(syncing) {
+  const btn = document.getElementById('sync-now-btn');
+  const ic  = document.getElementById('sync-btn-ic');
+  const dot = document.getElementById('sync-dot');
+  if (syncing) {
+    if (btn) btn.disabled = true;
+    if (ic)  ic.outerHTML = '<span id="sync-btn-ic" class="sync-spinner"></span>';
+    if (dot) dot.className = 'sync-dot syncing';
+  } else {
+    if (btn) btn.disabled = false;
+    const icEl = document.getElementById('sync-btn-ic');
+    if (icEl) { icEl.className = ''; icEl.textContent = '↻'; }
+    if (dot) dot.className = 'sync-dot active';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
