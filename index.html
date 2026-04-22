@@ -99,7 +99,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:9
 
 /* ── PAGE VISIBILITY ── */
 .page{display:none}
-.page.active{display:block;min-height:100%}
+.page.active{display:block}
 
 /* ── STAT CARDS ── */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
@@ -570,15 +570,14 @@ iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;backg
               </div>
             </div>
           </div>
-            <!-- Quick send -->
-            <div class="panel">
-              <div class="ph"><div class="pt">Quick Send — All Pending</div></div>
-              <div class="pb">
-                <div class="g2">
-                  <div class="qcard" onclick="confirmSend(1)"><div class="qc-num">Email 1 · Day 0 — THE MIRROR</div><div class="qc-subj">Something I want to say before you start.</div><div class="qc-sub">Send to all pending</div></div>
-                  <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 2 — THE OFFER</div><div class="qc-subj">What changes. And when.</div><div class="qc-sub">Send to all pending</div></div>
-                  <div class="qcard" style="border-color:rgba(201,149,58,.3)" onclick="confirmSend(5)"><div class="qc-num" style="color:var(--gold)">⚡ Fast-Track — HOT LEAD OFFER</div><div class="qc-subj">You have been back three times now.</div><div class="qc-sub">Send to all pending hot leads</div></div>
-                </div>
+          <!-- Quick send -->
+          <div class="panel" style="margin-bottom:16px">
+            <div class="ph"><div class="pt">Quick Send — All Pending</div></div>
+            <div class="pb">
+              <div class="g2">
+                <div class="qcard" onclick="confirmSend(1)"><div class="qc-num">Email 1 · Day 0 — THE MIRROR</div><div class="qc-subj">Something I want to say before you start.</div><div class="qc-sub">Send to all pending</div></div>
+                <div class="qcard" onclick="confirmSend(2)"><div class="qc-num">Email 2 · Day 2 — THE OFFER</div><div class="qc-subj">What changes. And when.</div><div class="qc-sub">Send to all pending</div></div>
+                <div class="qcard" style="border-color:rgba(201,149,58,.3)" onclick="confirmSend(5)"><div class="qc-num" style="color:var(--gold)">⚡ Fast-Track — HOT LEAD OFFER</div><div class="qc-subj">You have been back three times now.</div><div class="qc-sub">Send to all pending hot leads</div></div>
               </div>
             </div>
           </div>
@@ -611,12 +610,14 @@ iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;backg
             <div class="sh-right"><button class="btn" onclick="loadEmails()">↻ Reload from Sheet</button></div>
           </div>
           <div class="info-box">
-            Changes saved here update your <strong>Script Properties</strong> — the actual email text your leads receive. Use <strong>{{firstName}}</strong> anywhere in the body and it will be replaced with the lead's first name. Email 5 has extra fields for price and CTA links.
+            Changes saved here update your <strong>Apps Script Script Properties directly</strong> — the actual email text your leads receive is updated <strong style="color:var(--high)">immediately on save</strong>. Use <strong>{{firstName}}</strong> anywhere in the body and it will be replaced with the lead's first name. Email 5 / Fast-Track has extra fields for price and CTA links. <span style="color:var(--hot)">⚠ You must have a valid Script URL and password entered above for saves to reach Apps Script.</span>
           </div>
           <div class="email-tabs" id="email-tabs">
             <button class="etab active" onclick="switchEmail(1)">Email 1 · Day 0 — The Mirror</button>
+            <button class="etab" onclick="switchEmail('preview-1')" style="border-color:rgba(110,171,221,.2);color:var(--ret)">👁 Preview E1</button>
             <button class="etab" onclick="switchEmail(2)">Email 2 · Day 2 — The Offer</button>
-            <button class="etab" onclick="switchEmail('ft')">⚡ Fast-Track — Hot Lead (3rd Login)</button>
+            <button class="etab" onclick="switchEmail('preview-2')" style="border-color:rgba(110,171,221,.2);color:var(--ret)">👁 Preview E2</button>
+            <button class="etab" onclick="switchEmail('ft')">⚡ Fast-Track — Hot Lead</button>
             <button class="etab" onclick="switchEmail('style')" style="border-color:rgba(110,171,221,.3);color:var(--ret)">🎨 Visual Style Editor</button>
           </div>
           <div id="email-panels">
@@ -1388,27 +1389,164 @@ function renderEmailPanels() {
     </div>
   </div>`;
 
-  panels.innerHTML = seqPanels + ftPanel + stylePanel();
+  // Build preview panels for Email 1 and Email 2
+  const previewPanels = [1,2].map(n => `<div class="ep" id="ep-preview-${n}">
+    <div class="info-box" style="margin-bottom:14px">
+      <strong style="color:var(--gold)">👁 Email ${n} Preview</strong> — This is exactly how your leads will see this email in their inbox. The preview uses your current <strong>Visual Style Editor</strong> settings and the subject/body you have saved.
+    </div>
+    <div style="display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Barlow',sans-serif;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:5px">Subject Line Preview</div>
+        <div id="ep-preview-${n}-subj" style="background:var(--card2);border:1px solid var(--border-light);border-radius:8px;padding:9px 13px;font-size:13.5px;color:var(--text)">—</div>
+      </div>
+      <button class="btn" style="flex-shrink:0" onclick="refreshEmailPreview(${n})">↻ Refresh Preview</button>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'Barlow',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)">Rendered Email — Live Preview</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:8.5px;color:var(--dim)">Uses your Visual Style settings · {{firstName}} shown as sample name</div>
+      </div>
+      <div style="padding:16px;background:var(--card2);overflow-y:auto;max-height:70vh">
+        <iframe id="ep-preview-${n}-frame" style="width:100%;height:700px;border:none;border-radius:6px;background:#e8e4d8" scrolling="auto"></iframe>
+      </div>
+    </div>
+  </div>`).join('');
+
+  panels.innerHTML = seqPanels + ftPanel + previewPanels + stylePanel();
   // After rendering, activate the correct tab
   switchEmail(1);
+}
+
+function refreshEmailPreview(n) {
+  const s = loadStylePrefs();
+  const iframe = document.getElementById('ep-preview-' + n + '-frame');
+  const subjEl = document.getElementById('ep-preview-' + n + '-subj');
+  if (!iframe) return;
+
+  // Get subject from the editor fields
+  const subjInput = document.getElementById('e' + n + '-subj');
+  const subj = subjInput ? subjInput.value : (defaultSubjects[n-1] || '(No subject)');
+  if (subjEl) subjEl.textContent = subj;
+
+  // Get body from editor
+  const bodyInput = document.getElementById('e' + n + '-body');
+  const rawBody = bodyInput ? bodyInput.value.trim() : '';
+
+  const fontStack = s.bodyFont === 'Georgia' ? "Georgia,serif" :
+                    s.bodyFont === 'Trebuchet MS' ? "'Trebuchet MS',sans-serif" :
+                    s.bodyFont === 'Times New Roman' ? "'Times New Roman',serif" :
+                    `'${s.bodyFont}',Georgia,serif`;
+  const gfLink = ['Source Serif 4','Playfair Display','Lora','Merriweather'].includes(s.bodyFont)
+    ? `<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(s.bodyFont)}:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">` : '';
+
+  const topLine = (s.goldLinePos==='top-only'||s.goldLinePos==='both')
+    ? `<tr><td style="height:${s.goldLineThick}px;background:${s.goldLine};font-size:0;line-height:0;">&nbsp;</td></tr>` : '';
+  const bottomLine = (s.goldLinePos==='bottom'||s.goldLinePos==='both')
+    ? `<tr><td style="padding:0 40px 24px;"><div style="height:${s.goldLineThick}px;background:${s.goldLine};"></div></td></tr>` : '';
+
+  // Format body text → HTML paragraphs, replacing {{firstName}} with sample name
+  let bodyHtml = '';
+  if (rawBody) {
+    const lines = rawBody.replace(/\{\{firstName\}\}/g, 'James').split('\n');
+    // First non-empty line that starts with "Hey" gets greeting styling
+    let firstLineDone = false;
+    let paras = [];
+    let currentPara = [];
+    for (const line of lines) {
+      if (line.trim() === '') {
+        if (currentPara.length) { paras.push(currentPara.join('<br>')); currentPara = []; }
+      } else {
+        currentPara.push(line);
+      }
+    }
+    if (currentPara.length) paras.push(currentPara.join('<br>'));
+    bodyHtml = paras.map((para, idx) => {
+      const isGreeting = idx === 0 && /^hey\s/i.test(para.trim());
+      if (isGreeting) {
+        return `<p style="margin:0 0 18px 0;font-size:${s.greetingSize}px;font-weight:${s.greetingBold?'600':'400'};color:${s.greetingColor};font-family:${fontStack};">${para}</p>`;
+      }
+      return `<p style="margin:0 0 18px 0;">${para}</p>`;
+    }).join('');
+  } else {
+    // Default placeholder body with proper greeting styling
+    const defaults = [
+      [
+        `<p style="margin:0 0 18px 0;font-size:${s.greetingSize}px;font-weight:${s.greetingBold?'600':'400'};color:${s.greetingColor};font-family:${fontStack};">Hey James,</p>`,
+        `<p style="margin:0 0 18px 0;">Before you open Chapter 01, I want to tell you something.</p>`,
+        `<p style="margin:0 0 18px 0;">You will probably read the first few pages and think: this is about me. Not in a general way. In a specific, uncomfortable, <em>how-does-he-know-that</em> way.</p>`,
+        `<p style="margin:0 0 18px 0;">They will make sense after this.</p>`,
+        `<p style="margin:0 0 18px 0;">I will be back in two days.</p>`
+      ].join(''),
+      [
+        `<p style="margin:0 0 18px 0;font-size:${s.greetingSize}px;font-weight:${s.greetingBold?'600':'400'};color:${s.greetingColor};font-family:${fontStack};">Hey James,</p>`,
+        `<p style="margin:0 0 18px 0;">Two chapters in.</p>`,
+        `<p style="margin:0 0 18px 0;">What you have done in these two chapters is understand the problem. That is not a small thing. Most men never get here.</p>`,
+        `<p style="margin:0 0 18px 0;">The price right now is ₹999. That moves to ₹1999 when this phase closes.</p>`
+      ].join('')
+    ];
+    bodyHtml = defaults[n-1] || `<p style="margin:0 0 18px 0;color:var(--dim);">(Email body will appear here — type in the editor tab and switch back to preview)</p>`;
+  }
+
+  const label = n === 1 ? 'THE MIRROR' : 'THE OFFER';
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+  ${gfLink}
+  </head>
+  <body style="margin:0;padding:0;background:${s.bgColor};font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${s.bgColor};padding:24px 12px;">
+  <tr><td align="center">
+  <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:${s.cardColor};border:1px solid ${s.borderColor};">
+    <tr><td style="background:${s.cardColor};border-bottom:1px solid ${s.borderColor};padding:18px 36px;">
+      <table width="100%" cellpadding="0" cellspacing="0"><tr>
+        <td style="font-family:Barlow,sans-serif;font-size:11px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;color:${s.headerBrand};">PERSUASION ACADEMY BY RA</td>
+        <td align="right" style="font-family:Barlow,sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${s.borderColor};">${label}</td>
+      </tr></table>
+    </td></tr>
+    ${topLine}
+    <tr><td style="padding:32px 36px 24px;background:${s.cardColor};">
+      <div style="font-family:${fontStack};font-size:${s.bodySize}px;color:${s.bodyColor};line-height:1.82;">
+        ${bodyHtml}
+        <br>
+        <span style="font-family:Barlow,sans-serif;font-size:14px;font-weight:700;letter-spacing:.07em;color:${s.signoffColor};">RA</span><br>
+        <span style="font-family:Barlow,sans-serif;font-size:11px;color:${s.credColor};letter-spacing:.03em;">Dating and Relationship Expert | Human Nature and Dark Attraction Patterns | Making dating easier for men</span>
+      </div>
+    </td></tr>
+    ${bottomLine}
+    <tr><td style="background:${s.cardColor};border-top:1px solid ${s.borderColor};padding:14px 36px 18px;">
+      <div style="font-family:Barlow,sans-serif;font-size:10px;color:${s.credColor};line-height:1.7;">
+        You received this because you enrolled in the Fundamentals Course. &nbsp;·&nbsp; <a href="#" style="color:${s.headerBrand};text-decoration:underline;">Unsubscribe</a>
+      </div>
+    </td></tr>
+  </table>
+  </td></tr></table>
+  </body></html>`;
+
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
 }
 
 function switchEmail(tab) {
   // Update tab buttons
   document.querySelectorAll('.etab').forEach((btn, i) => {
-    const tabs = [1, 2, 'ft', 'style'];
+    const tabs = [1, 'preview-1', 2, 'preview-2', 'ft', 'style'];
     btn.classList.toggle('active', tabs[i] === tab);
   });
   // Hide all panels
   document.querySelectorAll('.ep').forEach(p => p.classList.remove('active'));
   // Show target panel
-  const target = tab === 'style' ? 'ep-style' : tab === 'ft' ? 'ep-ft' : 'ep-' + tab;
+  let target;
+  if (tab === 'style') target = 'ep-style';
+  else if (tab === 'ft') target = 'ep-ft';
+  else if (typeof tab === 'string' && tab.startsWith('preview-')) target = 'ep-' + tab;
+  else target = 'ep-' + tab;
   const el = document.getElementById(target);
   if (el) {
     el.classList.add('active');
-    // Trigger preview render when switching to style tab
     if (tab === 'style') {
       setTimeout(() => updateStylePreview(), 50);
+    } else if (typeof tab === 'string' && tab.startsWith('preview-')) {
+      const n = parseInt(tab.split('-')[1]);
+      setTimeout(() => refreshEmailPreview(n), 50);
     }
   }
 }
@@ -1608,7 +1746,7 @@ function stylePanel() {
 
   return `<div class="ep" id="ep-style">
     <div class="info-box" style="margin-bottom:16px">
-      <strong style="color:var(--gold)">🎨 Visual Style Editor</strong> — Customize exactly how your emails look. Changes show instantly in the preview. When you're happy, click <strong>Save Style</strong> and then copy the generated snippet into your <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">Code.gs</code> to apply to all sent emails.
+      <strong style="color:var(--gold)">🎨 Visual Style Editor</strong> — Customize how your emails look in your leads' inboxes. <strong style="color:var(--high)">💾 Save Style</strong> saves to <em>both</em> this browser (localStorage) <em>and</em> your Apps Script Script Properties directly — so the <strong>next real email sent to leads uses the new style automatically</strong>. Use <strong>Copy Code.gs Snippet</strong> if you prefer to paste the values manually into Code.gs instead.
     </div>
     <div class="style-editor">
       <!-- LEFT: Controls -->
@@ -1680,7 +1818,7 @@ function stylePanel() {
           <button class="btn ghost" onclick="resetStyle()">↺ Reset</button>
         </div>
         <div style="background:rgba(201,149,58,.04);border:1px dashed rgba(201,149,58,.2);border-radius:8px;padding:10px 13px;font-size:11.5px;color:var(--dim);line-height:1.6;margin-bottom:20px">
-          <strong style="color:var(--muted)">How saving works:</strong> "Save Style" stores your preferences in this browser (localStorage) and updates the live preview. To apply your style to <em>actual emails sent to leads</em>, click <strong style="color:var(--gold)">Copy Code.gs Snippet</strong> and paste it into your Apps Script <code style="background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--gold)">sendSequenceEmail()</code> function.
+          <strong style="color:var(--muted)">How saving works:</strong> <strong style="color:var(--high)">Save Style</strong> saves preferences to your browser <em>and</em> pushes them to Apps Script Script Properties in one click — no manual copy needed. <strong style="color:var(--gold)">Copy Code.gs Snippet</strong> is an optional manual backup if you want to hardcode the values into Code.gs directly.
         </div>
       </div>
 
@@ -1692,14 +1830,14 @@ function stylePanel() {
             <div style="font-family:'Barlow',sans-serif;font-size:8.5px;color:var(--dim)">Updates as you change settings</div>
           </div>
           <div class="preview-frame-wrap">
-            <iframe id="style-preview" scrolling="no" onload="resizePreview(this)"></iframe>
+            <iframe id="style-preview" scrolling="auto" onload="resizePreview(this)"></iframe>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Generated Code Snippet -->
-    <div class="panel" style="margin-top:16px" id="snippet-panel" style="display:none">
+    <div class="panel" id="snippet-panel" style="margin-top:16px;display:none">
       <div class="ph"><div class="pt">📋 Code.gs Snippet — Paste into sendSequenceEmail()</div><button class="btn sm" onclick="copySnippetText()">Copy</button></div>
       <div class="pb">
         <pre id="snippet-text" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;color:var(--gold);overflow-x:auto;white-space:pre-wrap;line-height:1.7;font-family:'DM Sans',monospace"></pre>
@@ -1764,8 +1902,9 @@ function copyStyleSnippet() {
   const snippet = generateSnippet(s);
   const panel = document.getElementById('snippet-panel');
   const pre   = document.getElementById('snippet-text');
-  if (panel) panel.style.display = '';
-  if (pre)   pre.textContent = snippet;
+  if (!panel || !pre) { toast('Snippet panel not found — try reloading the editor','err'); return; }
+  panel.style.display = '';
+  pre.textContent = snippet;
   panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -2013,7 +2152,7 @@ function nav(id) {
   document.getElementById('pg-title').textContent = m[0];
   document.getElementById('pg-sub').textContent   = m[1];
   if (id==='editor') {
-    renderEmailPanels();
+    if (!document.querySelector('#email-panels .ep')) renderEmailPanels();
     if (SCRIPT_URL && !emailData.length) loadEmails();
   }
 }
@@ -2341,12 +2480,12 @@ function renderStatsPage() {
         return `<tr>
           <td style="font-family:'Barlow',sans-serif;font-weight:700;color:var(--dim)">E${e.emailNum}</td>
           <td style="font-weight:500">${e.label||'—'}</td>
+          <td style="text-align:center;color:var(--dim)">${e.day!=null?'Day '+e.day:'—'}</td>
           <td style="text-align:center;color:var(--muted)">${e.sent||0}</td>
           <td style="text-align:center;color:var(--ret)">${e.opened||0}</td>
           <td style="text-align:center;${orCls}">${e.openRate!=null?e.openRate+'%':'—'}</td>
           <td style="text-align:center;color:var(--high)">${e.ctaClicked||0}</td>
           <td style="text-align:center;${crCls}">${e.ctaRate!=null?e.ctaRate+'%':'—'}</td>
-          <td style="text-align:center;color:var(--dim)">${e.avgMinsToOpen!=null?e.avgMinsToOpen+'m':'—'}</td>
           <td style="text-align:right;font-family:'Barlow',sans-serif;font-weight:700;color:var(--gold)">${e.revenueAfterThisEmail?'₹'+Number(e.revenueAfterThisEmail).toLocaleString():'—'}</td>
         </tr>`;
       }).join('');
