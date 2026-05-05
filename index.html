@@ -407,6 +407,9 @@ iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;backg
       <button class="nav-item" onclick="nav('purchases')"><span class="nav-ic">💰</span>Purchases<span class="nav-bd nb-gold" id="nb-purch">0</span></button>
       <button class="nav-item" onclick="nav('failures')"><span class="nav-ic">⚠</span>Failed Emails<span class="nav-bd nb-hot" id="nb-fail" style="display:none">0</span></button>
       <button class="nav-item" onclick="nav('dailylog')"><span class="nav-ic">📋</span>Daily Send Log</button>
+      <div class="nav-grp">Campaign</div>
+      <button class="nav-item" onclick="nav('campaign')"><span class="nav-ic">🎚</span>Beta Toggle</button>
+      <button class="nav-item" onclick="nav('activity')"><span class="nav-ic">👁</span>Daily Activity</button>
       <div class="nav-grp">Settings</div>
       <button class="nav-item" onclick="nav('settings')"><span class="nav-ic">⚙</span>Configuration</button>
     </nav>
@@ -745,6 +748,93 @@ iframe#style-preview{width:100%;height:620px;border:none;border-radius:6px;backg
       </div>
 
       <!-- ═══ SETTINGS ═══ -->
+      <!-- ═══ CAMPAIGN CONTROL ═══ -->
+      <div id="page-campaign" class="page">
+        <div class="content">
+          <div class="sh"><div class="sh-title">Campaign <em>Control</em></div></div>
+
+          <div class="g2">
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">🎚 Beta Offer Toggle</div></div>
+                <div class="pb">
+                  <div class="info-box" style="margin-bottom:16px">Controls what users see at the end of the free course. Switch between states instantly — no HTML editing required.</div>
+
+                  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                    <div class="toggle-row" id="beta-status-row" style="border-color:rgba(201,149,58,0.3);background:rgba(201,149,58,0.05);">
+                      <div>
+                        <div style="font-size:13px;color:var(--text);font-weight:500" id="beta-status-label">Checking status...</div>
+                        <div style="font-size:11px;color:var(--muted);margin-top:3px" id="beta-status-sub">Loading from Apps Script</div>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <span style="font-size:18px" id="beta-status-icon">⏳</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex;flex-direction:column;gap:9px">
+                    <button class="btn pri" style="width:100%" onclick="setBeta('on')">✅ Turn ON — Show Free Access Invite</button>
+                    <button class="btn" style="width:100%;border-color:rgba(201,149,58,0.3)" onclick="setBeta('off')">🔒 Turn OFF — Show Coming Soon Message</button>
+                  </div>
+
+                  <div style="margin-top:16px;padding:12px;background:var(--card2);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.7">
+                    <strong style="color:var(--text)">ON</strong> — Users see the free masterclass invite with READY keyword DM<br>
+                    <strong style="color:var(--text)">OFF</strong> — Users see "something bigger is coming, follow us on Instagram"
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="panel">
+                <div class="ph"><div class="pt">📊 Beta Stats</div></div>
+                <div class="pb">
+                  <div class="stats-grid" style="grid-template-columns:1fr 1fr;gap:10px" id="beta-stats">
+                    <div class="stat"><div class="stat-ey">Course Finishers</div><div class="stat-n c-gold" id="bs-finishers">—</div><div class="stat-sub">Reached end of Ch2</div></div>
+                    <div class="stat"><div class="stat-ey">Active Today</div><div class="stat-n c-high" id="bs-today">—</div><div class="stat-sub">Unique logins today</div></div>
+                  </div>
+                  <div class="info-box" style="margin-top:14px">Track DMs separately on Instagram. When you hit 20–30 READY DMs, flip the toggle OFF.</div>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:16px">
+                <div class="ph"><div class="pt">⚡ Quick Actions</div></div>
+                <div class="pb" style="display:flex;flex-direction:column;gap:9px">
+                  <button class="btn" style="width:100%" onclick="checkBetaStatus()">↻ Refresh Current Status</button>
+                  <a class="btn" style="width:100%;display:block;text-align:center;text-decoration:none" href="https://www.instagram.com/direct/inbox/" target="_blank">📩 Open Instagram DMs</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DAILY ACTIVITY ═══ -->
+      <div id="page-activity" class="page">
+        <div class="content">
+          <div class="sh">
+            <div class="sh-title">Daily <em>Activity</em></div>
+            <div class="sh-right"><button class="btn pri" onclick="loadActivity()">↻ Refresh</button></div>
+          </div>
+          <div class="info-box">One ping per user per login. Shows who was active today, which chapter they were on, and when they last visited.</div>
+          <div class="stats-grid" style="margin-bottom:16px">
+            <div class="stat"><div class="stat-ey">Active Today</div><div class="stat-n c-gold" id="act-today">—</div><div class="stat-sub">Unique users</div></div>
+            <div class="stat"><div class="stat-ey">On Chapter 1</div><div class="stat-n" id="act-ch1">—</div><div class="stat-sub">Currently reading</div></div>
+            <div class="stat"><div class="stat-ey">On Chapter 2</div><div class="stat-n c-high" id="act-ch2">—</div><div class="stat-sub">Further along</div></div>
+            <div class="stat"><div class="stat-ey">Reached End</div><div class="stat-n" style="color:var(--ret)" id="act-end">—</div><div class="stat-sub">Saw beta invite</div></div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="pt">👁 Activity Feed — Today</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Chapter</th><th>Last Seen</th><th>Pings</th></tr></thead>
+                <tbody id="activity-tbody"><tr><td colspan="5" class="empty"><div class="empty-ic">◌</div><div class="empty-tx">Load data to see activity</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="page-settings" class="page">
         <div class="content">
           <div class="sh"><div class="sh-title"><em>Configuration</em></div></div>
