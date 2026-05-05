@@ -2245,6 +2245,8 @@ function nav(id) {
     if (!document.querySelector('#email-panels .ep')) renderEmailPanels();
     if (SCRIPT_URL && !emailData.length) loadEmails();
   }
+  if (id==='campaign') setTimeout(checkBetaStatus, 100);
+  if (id==='activity') setTimeout(loadActivity, 100);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2784,6 +2786,87 @@ function renderDailyLog() {
     }
   });
 })();
+
+// ═══════════════════════════════════════════════════════
+//  BETA TOGGLE
+// ═══════════════════════════════════════════════════════
+
+function updateBetaUI(isOn) {
+  const label = document.getElementById('beta-status-label');
+  const sub   = document.getElementById('beta-status-sub');
+  const icon  = document.getElementById('beta-status-icon');
+  const row   = document.getElementById('beta-status-row');
+  if (!label) return;
+  label.textContent     = isOn ? 'Beta Offer is ON'  : 'Beta Offer is OFF';
+  sub.textContent       = isOn ? 'Users see the free access invite at end of course' : 'Users see the coming soon message';
+  icon.textContent      = isOn ? '✅' : '🔒';
+  row.style.borderColor = isOn ? 'rgba(126,221,110,0.4)' : 'rgba(201,149,58,0.3)';
+  row.style.background  = isOn ? 'rgba(126,221,110,0.06)' : 'rgba(201,149,58,0.05)';
+}
+
+function checkBetaStatus() {
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL in Settings first', 'err'); return; }
+  const cb = '__beta_' + Date.now();
+  const timer = setTimeout(() => { delete window[cb]; toast('Status check timed out', 'err'); }, 10000);
+  window[cb] = function(d) {
+    clearTimeout(timer); delete window[cb];
+    updateBetaUI(d.beta === 'on');
+  };
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + '?action=get_beta_status&callback=' + cb;
+  s.onerror = () => { clearTimeout(timer); delete window[cb]; toast('Could not reach Apps Script', 'err'); };
+  document.head.appendChild(s);
+}
+
+async function setBeta(state) {
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL in Settings first', 'err'); return; }
+  if (!PW)         { toast('Enter your admin password in Settings first', 'err'); return; }
+  try {
+    const data = await api('set_beta', '&state=' + encodeURIComponent(state));
+    toast(data.message || 'Beta is now ' + state.toUpperCase(), 'ok');
+    updateBetaUI(state === 'on');
+  } catch(e) { toast('Failed — check URL and password in Settings', 'err'); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  DAILY ACTIVITY
+// ═══════════════════════════════════════════════════════
+
+async function loadActivity() {
+  if (!SCRIPT_URL) { toast('Enter your Apps Script URL in Settings first', 'err'); return; }
+  if (!PW)         { toast('Enter your admin password in Settings first', 'err'); return; }
+  try {
+    const data = await api('get_activity');
+    const rows = data.data || [];
+    const ch1  = rows.filter(r => (r.chapter||'').includes('ch1') && !(r.chapter||'').includes('ch2')).length;
+    const ch2  = rows.filter(r => (r.chapter||'').includes('ch2') && !(r.chapter||'').includes('abundance')).length;
+    const end  = rows.filter(r => (r.chapter||'').includes('abundance')).length;
+    document.getElementById('act-today').textContent = rows.length || '0';
+    document.getElementById('act-ch1').textContent   = ch1 || '0';
+    document.getElementById('act-ch2').textContent   = ch2 || '0';
+    document.getElementById('act-end').textContent   = end || '0';
+    document.getElementById('bs-today').textContent  = rows.length || '—';
+    const tbody = document.getElementById('activity-tbody');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">No activity recorded yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(r => {
+      const ch = (r.chapter||'cover')
+        .replace('sec-ch1','Chapter 1').replace('ch1','Chapter 1')
+        .replace('abundance','Ch2 — End')
+        .replace('sec-ch2','Chapter 2').replace('ch2','Chapter 2')
+        .replace('sec-cover','Cover').replace('cover','Cover');
+      return '<tr>'
+        + '<td><strong>' + (r.name||'—') + '</strong></td>'
+        + '<td style="color:var(--muted);font-size:12px">' + (r.email||'—') + '</td>'
+        + '<td><span style="font-size:11px;padding:2px 8px;background:rgba(201,149,58,0.1);border-radius:4px;color:var(--gold)">' + ch + '</span></td>'
+        + '<td style="font-size:12px;color:var(--muted)">' + (r.lastSeen||'—') + '</td>'
+        + '<td style="font-size:12px;color:var(--muted);text-align:center">' + (r.pings||1) + '</td>'
+        + '</tr>';
+    }).join('');
+  } catch(e) { toast('Failed to load activity — check URL and password', 'err'); }
+}
 </script>
 
 </body>
